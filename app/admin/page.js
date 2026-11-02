@@ -140,6 +140,9 @@ export default function AdminPage() {
   const generateCampaignId = () => 'cam_' + Math.random().toString(36).substr(2, 7);
 
   const handleCreateCampaign = async (e) => {
+    console.log('handleCreateCampaign chamado!');
+    console.log('form:', form);
+    console.log('config:', config);
     e.preventDefault();
     if (!form.blackUrl) {
       setMessage({ type: 'error', text: 'Preencha o SITE BLACK' });
