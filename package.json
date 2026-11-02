@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "fallback": "node server-fallback.js"
+    "fallback": "node server-fallback.js",
+    "seed": "node seed-config.js",
+    "vercel-postinstall": "node seed-config.js"
   },
   "dependencies": {
     "next": "14.2.5",

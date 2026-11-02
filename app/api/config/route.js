@@ -55,6 +55,31 @@ function readConfig() {
   return { ...DEFAULT_CONFIG };
 }
 
+function validateAndMerge(body) {
+  // Garante que body seja um objeto
+  if (typeof body !== 'object' || body === null) {
+    return DEFAULT_CONFIG;
+  }
+
+  const result = { ...DEFAULT_CONFIG };
+  const validKeys = new Set(Object.keys(DEFAULT_CONFIG));
+
+  Object.keys(body).forEach(key => {
+    if (validKeys.has(key)) {
+      result[key] = body[key];
+    }
+    // Ignora campos extra (evita corromper o config)
+  });
+
+  // Garante estrutura correta
+  result.campaigns = Array.isArray(result.campaigns) ? result.campaigns : [];
+  result.geoSettings = result.geoSettings || { allowedCountries: [], blockedCountries: [] };
+  result.geoSettings.allowedCountries = Array.isArray(result.geoSettings.allowedCountries) ? result.geoSettings.allowedCountries : [];
+  result.geoSettings.blockedCountries = Array.isArray(result.geoSettings.blockedCountries) ? result.geoSettings.blockedCountries : [];
+
+  return result;
+}
+
 export async function GET(request) {
   const config = readConfig();
   return NextResponse.json(config);
@@ -67,9 +92,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Corpo da requisição deve ser um objeto JSON' }, { status: 400 });
     }
 
-    const newConfig = { ...DEFAULT_CONFIG, ...body };
-    newConfig.campaigns = Array.isArray(newConfig.campaigns) ? newConfig.campaigns : [];
-    newConfig.geoSettings = newConfig.geoSettings || { allowedCountries: [], blockedCountries: [] };
+    const newConfig = validateAndMerge(body);
 
     if (!fs.existsSync(STORAGE_DIR)) {
       fs.mkdirSync(STORAGE_DIR, { recursive: true });
