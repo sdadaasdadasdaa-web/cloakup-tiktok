@@ -1,150 +1,264 @@
-# Como usar o Cloaker — Passo a Passo
+# CLOAKUP - Manual do Usuário
 
-Esta é a versão simplificada do cloaker. Você só precisa de 3 coisas:
+## Visão Geral
 
-1. **Site BLACK** — sua oferta real (landing page de vendas)
-2. **Site WHITE** — um site qualquer (notícia, blog, YouTube) pra disfarce
-3. **Seus links de anúncio** do TikTok/Facebook
+O **CLOAKUP** é um filtro de tráfego de alto nível projetado para proteger sua oferta no TikTok Ads. Ele se inspira nas melhores práticas do **CloakUp**, **Therabot** e **Clocap**.
 
 ---
 
-## Passo 1 — Subir o projeto
+## 🎯 Objetivo
+
+Proteger a oferta **https://importa-chiina.vercel.app/** dos bots do TikTok Ads Manager, serviços de espionagem e tráfego indesejado:
+
+- ✅ **Mobile real (iPhone/Android)** com params do TikTok → **LIBERADO** pra oferta (BLACK)
+- ❌ **PC, bots, crawlers, proxies, VPNs, espionagem** → **BLOQUEADO** no disfarce (WHITE)
+
+---
+
+## 📝 ETAPA 1: Adicionar Domínio / Configurar Oferta
+
+### Acesse o Painel
+```
+http://localhost:3000/admin   (local)
+https://seu-cloaker.vercel.app/admin   (produção)
+```
+
+### Defina os Sites
+1. **Site BLACK (oferta real)**: `https://importa-chiina.vercel.app/`
+   - É para aqui que vai o tráfego legítimo (mobile + params)
+2. **Site WHITE (disfarce)**: ex: `https://www.tiktok.com` ou um site de notícias
+   - É para aqui que vão bots, PCs, e quem não cumpre os requisitos
+
+### Como funciona o disfarce
+O site WHITE deve parecer uma página qualquer — um post de notícia, vídeo do TikTok, blog. Isso evita suspeitas se alguém acessar o link sem passar nos filtros.
+
+---
+
+## 📝 ETAPA 2: Criar Campanha
+
+No painel `/admin`, clique em **"Nova Campanha"**:
+
+1. **Nome da campanha**: ex: `Oferta Prancha Eletrica`, `Black Friday`
+2. **Codificador (campaign_id)**: gerado automaticamente (ex: `cam_abc123`)
+3. **Site BLACK**: sua oferta
+4. **Site WHITE**: seu disfarce
+
+### Configure os Filtros
+
+No painel, a aba **"Filtros"** permite configurar:
+
+#### Bots
+- ✅ **Bots TikTok/ByteDance** — sempre bloqueados
+- ✅ **Bots de busca** (Googlebot, Bingbot) — opcionais
+- ✅ **Headless browsers** (puppeteer, selenium, playwright)
+- ✅ **Scanners** (sqlmap, nikto, nmap)
+- ✅ **Emuladores** (BlueStacks, Genymotion, LDPlayer)
+
+#### Proxy/VPN
+- 🚫 Bloqueia IPs de datacenter, cloud, hosting
+- 🚫 Bloqueia proxies anônimos e VPNs
+- ⚠️ Use com cuidado: pode bloquear alguns usuários legítimos em redes corporativas
+
+#### AdSpy
+- 🚫 Bloqueia apps de espionagem de anúncios (AdSpy, AdMonitor, SocialBlade, Exolyt)
+- Essencial para evitar que concorrentes monitoruem seus anúncios
+
+#### Geolocalização
+- 🌍 **Países permitidos**: ex: `BR`, `US`, `PT` (deixe vazio para permitir todos)
+- 🚫 **Países bloqueados**: ex: `CN`, `RU`, `KP`
+- Detectado via headers de CDN (Cloudflare: `CF-IPCountry`)
+
+#### Dispositivos
+- 📱 **Mobile-only**: só celulares reais (iPhone/Android) entram
+- 🚫 Desktops, tablets, emuladores bloqueados
+- ⚙️ Desative para permitir desktop
+
+#### Referência (Referer)
+- ✔️ Exige que o tráfego venha de `tiktok.com`, `vm.tiktok.com`, `vt.tiktok.com`
+- Reforça a validação de que o clique veio do TikTok Ads
+
+#### Parâmetros de URL
+- ✔️ Exige: `utm_source=tiktok`, `utm_campaign`, `utm_medium=cpc`, `utm_content`
+- Qualquer coisa fora disso → disfarce
+- **Importante**: o TikTok Ads precisa enviar esses params — configure no TikTok Ads Manager os parâmetros de rastreamento!
+
+#### Idioma do Navegador
+- 🌐 Exige `pt-BR`, `pt-PT`, `en-US`, etc.
+- Útil para ofertas voltadas a um país específico
+
+#### User Agent
+- 🔧 Adicione padrões customizados de UA a bloquear
+- Ex: UA de apps específicos que você não quer
+
+#### ISP
+- 🏢 Bloqueia provedores de datacenter (AWS, Azure, Google Cloud, etc.)
+- Em produção, requer integração com API de GeoIP
+
+#### Whitelist/Blacklist de IPs
+- ✅ **Whitelist**: IPs que SEMPRE entram (seu escritório, ferramentas de teste)
+- 🚫 **Blacklist**: IPs que SEMPRE são bloqueados
+
+---
+
+## 📝 ETAPA 3: Anunciar com Link Customizado
+
+### Gere o Link
+No painel, após criar a campanha, clique em **"COPIAR LINK"**.
+
+O link gerado será:
+```
+https://seu-cloaker.vercel.app/api/cloak?utm_source=tiktok&utm_campaign=cam_abc123&utm_medium=cpc&utm_content=anti&campaign_id=cam_abc123
+```
+
+### Suba no TikTok Ads
+
+1. No **TikTok Ads Manager**, crie um novo anúncio
+2. No campo **URL de destino**, cole o link customizado do CLOAKUP
+3. Publique o anúncio
+
+### Configuração no TikTok Ads Manager
+
+Para que os params cheguem completos:
+1. Crie uma **Tag de conversão** ou use **URL personalizada**
+2. Adicione os parâmetros de rastreamento: `utm_source`, `utm_campaign`, `utm_medium`, `utm_content`
+3. O TikTok substituirá automaticamente os valores dinâmicos
+
+---
+
+## 🔍 COMO TESTAR
+
+### 1. Testar no Celular (mobile real + params)
+Acesse o link customizado do seu celular com os params completos do TikTok:
+```
+https://seu-cloaker.vercel.app/api/cloak?utm_source=tiktok&utm_campaign=cam_abc123&utm_medium=cpc&utm_content=anti&campaign_id=cam_abc123
+```
+➡️ Deve ir para o **SITE BLACK** ✅
+
+### 2. Testar no PC
+Abra o mesmo link no Chrome/Firefox do PC:
+➡️ Deve ir para o **SITE WHITE** ❌
+
+### 3. Testar Bot
+Use um UA de bot:
+```bash
+curl -A "TikTok Advertising/1.0" https://seu-cloaker.vercel.app/api/cloak?utm_source=tiktok&utm_campaign=cam_abc123&utm_medium=cpc&utm_content=anti
+```
+➡️ Deve retornar **BLOCKED** ❌
+
+### 4. Verificar Logs
+Acesse `/admin` → **Log de acesso (tempo real)**:
+- Atualiza a cada 3 segundos
+- Filtre por campanha
+- Veja IP, dispositivo, decisão
+
+---
+
+## 🔐 SEGURANÇA
+
+### Token Bypass (estilo CloakUp)
+Link secreto que libera qualquer dispositivo — use só para testes:
+
+```
+https://seu-cloaker.vercel.app/api/cloak?bypass=SEU_TOKEN_JWT
+```
+
+Gere no painel: `/admin` → **Configurações** → **Token Bypass** → **Gerar Token**
+
+> ⚠️ **NUNCA** compartilhe seu token bypass publicamente!
+
+### Proteção de Dados
+- Config e logs salvos em `.cloaker/` (fora do Git)
+- `.bypass_secret.txt` — segredo JWT (fora do Git)
+- Nenhum dado sai do seu servidor
+
+### Proxy de Checkout
+Se sua oferta tem checkout, use `/api/proxy/checkout` para esconder o link BLACK do referer:
+```
+https://seu-cloaker.vercel.app/api/proxy/checkout?url=SEU_CHECKOUT_BLACK
+```
+
+---
+
+## 🚀 DEPLOY NA VERCEL
 
 ```bash
-cd "C:\Users\User\Downloads\cloaker deep"
-npm install
-npm run dev
-```
+# 1. Instale a CLI da Vercel
+npm i -g vercel
 
-Vai abrir em `http://localhost:3000`
+# 2. Faça login
+vercel login
 
-## Passo 2 — Configurar o painel
-
-Acesse: `http://localhost:3000/admin`
-
-O painel tem só 3 blocos:
-
-### Bloco 1 — Site BLACK
-
-Cole seu link de vendas real, ex:
-
-```
-https://seu-site.vercel.app/
-```
-
-É pra AQUI que o lead qualificado (celular + params do anúncio) vai ser mandado.
-
-### Bloco 2 — Site WHITE
-
-Cole um site qualquer pra onde os bloqueados vão, ex:
-
-```
-https://www.mundo-surf.com/pt/news/prancha-de-surf/guia-completo-iniciante-surf
-```
-
-Quem for bloqueado (PC, bot, emulator, params faltando) abre esse site — parece normal, ninguém desconfia.
-
-### Bloco 3 — Campanha / Link de anúncio
-
-Cole seu link de anúncio (do TikTok Ads Manager) e clique em **+ Adicionar**.
-
-Ex: `https://www.tiktok.com/@suaconta/video/1234567890`
-
-Aí ele já mostra os **requisitos** dessa campanha:
-
-> `celular real + utm_source + utm_campaign + utm_medium + utm_content`
-
----
-
-## Passo 3 — Criar os anúncios
-
-No TikTok Ads Manager, crie seus anúncios com o link assim:
-
-```
-https://SEU-SITE.com/?utm_source=tiktok&utm_campaign=campanha01&utm_medium=cpc&utm_content=criativo_a
-```
-
-Tem que vir **os 4 params**:
-
-| Param | Exemplo |
-|---|---|
-| `utm_source` | `tiktok` |
-| `utm_campaign` | `campanha01` |
-| `utm_medium` | `cpc` |
-| `utm_content` | `criativo_a` |
-
----
-
-## Passo 4 — Monitorar (na hora)
-
-No mesmo painel `/admin`, rola uma tabela em tempo real:
-
-| Hora | IP | Dispositivo | Decisão |
-|---|---|---|---|
-| 12:34 | 187.x.x.x | iPhone | ALLOWED (pra Black) |
-| 12:35 | 201.x.x.x | Windows | DECOY (pra White) |
-| 12:36 | 177.x.x.x | Bot | DECOY (pra White) |
-
-E tem 3 cartões no topo:
-
-- **Pra Site BLACK** — quantos leads qualificados chegaram
-- **Pra Site WHITE (bloqueados)** — quantos foram desviados
-- **Bots bloqueados** — quantos bots tentaram acessar
-
-Se um clique não foi pro BLACK, olha esse log: tá vindo de PC? Tá sem params? É bot? Aí você corrige.
-
----
-
-## Como o cloaker decide (regras fixas)
-
-| Entra -> Site BLACK | Sai -> Site WHITE |
-|---|---|
-| Celular real (Android/iOS) | PC / Notebook / Mac |
-| Params do anúncio completos | Params faltando/incompletos |
-| IP whitelist (escritorio/teste) | Bots (TikTok, Google, Facebook, ByteDance...) |
-| Token bypass (?/bypass=xyz) | Emuladores (BlueStacks, etc.) |
-
----
-
-## Token bypass (só pra você testar)
-
-Se quiser testar de PC ou de casa sem passar pelos filtros:
-
-1. No painel `/admin`, role até o fim
-2. Botão **"Gerar Token"**
-3. Copia o link: `seusite.com/?bypass=SEU_TOKEN`
-4. Abra que entra em qualquer dispositivo
-
-Guarda esse token em segundopara emergencias ou VIPs.
-
----
-
-## Colocar no ar (Vercel)
-
-```bash
+# 3. Faça o deploy
 vercel deploy --prod
 ```
 
-Depois usa o dominio que a Vercel mandar nos passos 2 e 3 acima.
+Ou importe o repositório direto no [vercel.com/new](https://vercel.com/new):
+- Framework Preset: **Next.js**
+- Build Command: `npm run build`
+- Output Directory: `.next`
 
 ---
 
-## Dicas
+## 🛠️ COMANDOS RÁPIDOS
 
-- **Sempre teste antes de subir campanha:** abra no navegador de celular e veja se vai pro BLACK.
-- **Sites WHITE:** use sites de nicho que facam sentido pro seu publico (se vende equipamento de surf, usa site de surfe; se vende suplemento, usa site de academia). Fica mais crivel.
-- **Nao use `tiktok.com` como WHITE** — muito obvio.
-- **Anuncios quebrados:** se muitos cliques forem pro WHITE, verifique se os params no Ads Manager estao todos ativados (especialmente `utm_content`).
+```bash
+# Iniciar localmente
+start.bat
+
+# Reiniciar servidor local
+cmd /c "cd /d C:\Users\User\Downloads\cloaker deep && start.bat"
+
+# Build para produção
+npm run build
+
+# Rodar na Vercel
+vercel deploy --prod
+
+# Parar servidor
+# Ctrl+C no terminal
+```
 
 ---
 
-Arquivos que você vai mexer so se quiser customizar:
+## 📊 MONITORAMENTO
 
-- `app/api/cloak/route.js` — regras de quem entra
-- `utils/ua.js` — lista de bots detectados
-- `app/api/config/read.js` / `save.js` — onde a config e salva
-- `app/api/logs/index.js` — onde os logs ficam
+No painel `/admin`:
+
+- **Campanhas**: gerencie ofertas e links
+- **Filtros**: ative/desative cada categoria
+- **Logs**: auditoria em tempo real (3s)
+- **Stats**: quantos cliques foram para BLACK vs WHITE vs BOTS
 
 ---
 
-Feito? É só isso. Abre o painel, cadastra, posta o anuncio e acompanha o log.
+## ❓ TROUBLESHOOTING
+
+### "Meus logs mostram muitos DECOY no mobile"
+- Verifique se os params `utm_source, utm_campaign, utm_medium, utm_content` estão chegando
+- No TikTok Ads, certifique-se de que os parâmetros de rastreamento estão ativos
+- Teste acessando diretamente do celular
+
+### "Bots ainda estão entrando"
+- Ative o filtro de bots estrito
+- Adicione mais assinaturas de UA em `strictTiktokBots`
+- Verifique o filtro de IP/datacenter
+
+### "Mobile legítimo vai pro WHITE"
+- Verifique se `forceMobileOnly` está correto
+- Teste com UA de iPhone/Android real
+- Verifique se os params estão todos presentes
+
+### "Config sumiu após deploy"
+- `.cloaker/config.json` está no `.gitignore` — ele não é versionado
+- Após deploy na Vercel, recrie as campanhas no painel `/admin`
+- As configurações persistem no servidor Vercel
+
+---
+
+## 📞 SUPORTE
+
+- README.md — visão geral do projeto
+- GUIA_USUARIO.md — este manual
+- `.cloaker/config.json` — configuração mestre
+
+© 2026 CLOAKUP — Proteção de Tráfego para TikTok Ads

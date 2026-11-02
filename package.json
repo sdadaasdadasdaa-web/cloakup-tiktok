@@ -1,13 +1,14 @@
 {
-  "name": "cloaker-gen",
-  "version": "1.0.0",
+  "name": "cloakup-tiktok-ads",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "fallback": "node server-fallback.js"
   },
   "dependencies": {
     "next": "14.2.5",
@@ -15,7 +16,8 @@
     "react-dom": "^18.3.1",
     "jsonwebtoken": "^9.0.2",
     "cors": "^2.8.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "ipaddr.js": "^2.2.0"
   },
   "devDependencies": {
     "eslint": "^8.57.0",

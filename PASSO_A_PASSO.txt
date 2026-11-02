@@ -1,0 +1,59 @@
+==========================================================
+PASSO A PASSO - COMO INICIAR O SERVIDOR
+==========================================================
+
+1. Abra o CMD (Prompt de Comando)
+   - Pressione WIN + R
+   - Digite: cmd
+   - Pressione Enter
+
+2. Navegue até a pasta do projeto (copie e cole este comando):
+
+   cd "C:\Users\User\Downloads\cloaker deep"
+
+3. Verifique se está na pasta certa (copie e cole):
+
+   dir
+
+   Você deve ver pastas como: app, node_modules, public, tests...
+
+4. INICIE O SERVIDOR (copie e cole):
+
+   npm run dev
+
+5. Aguarde alguns segundos... A última linha deve mostrar:
+
+   ✓ Ready in XXX ms
+   ○ Local:   http://localhost:3000
+
+6. Abra o SEU NAVEGADOR (Chrome, Edge, Firefox):
+
+   http://localhost:3000/admin
+
+==========================================================
+SE DER ERRO EM "npm run dev":
+==========================================================
+
+Erro: "npm náo é reconhecido" ou "node não é reconhecido"
+=> Instale o Node.js: https://nodejs.org (versão 18 ou superior)
+
+Erro: "spawn EPERM"
+=> Tente rodar o CMD como ADMINISTRADOR:
+   - Clique com botão direito no CMD
+   - Escolha "Executar como administrador"
+   - Repita os passos 2, 3 e 4
+
+Erro: "Cannot find module 'next'"
+=> Rode primeiro:
+   npm install
+   depois:
+   npm run dev
+
+==========================================================
+PARAR O SERVIDOR:
+==========================================================
+
+No terminal onde ele está rodando, pressione:
+   Ctrl + C
+
+==========================================================

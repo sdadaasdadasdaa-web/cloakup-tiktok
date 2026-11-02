@@ -6,8 +6,8 @@
 export function GET() {
   return new Response(JSON.stringify({
     status: 'ok',
-    service: 'cloaker-deep',
-    version: '1.0.0',
+    service: 'cloakup-tiktok-ads',
+    version: '2.0.0',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     mode: 'online',

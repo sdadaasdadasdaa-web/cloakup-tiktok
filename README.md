@@ -1,136 +1,209 @@
-# Cloaker Genérico — estilo CloakUp / Clocap / Cloakup
+# CLOAKUP - TikTok Ads Protection (v2.0)
 
-Cloaker genérico para proteger qualquer oferta em anúncios de rede (TikTok Ads, Facebook Ads, etc.): bloqueia bots, libera **apenas celulares (Android/iOS) reais** com os params do anúncio completos, e envia os bloqueados para um site branco (disfarce).
+**Proteção de tráfego de alto nível para sua oferta no TikTok Ads**
 
----
-
-## Como usar (3 passos)
-
-### Passo 1 — Abra o painel
-```
-seusite.com/admin
-```
-
-### Passo 2 — Configure
-1. **Site BLACK**: cole o link da sua oferta real (ex: `https://seu-landing.vercel.app/`). É pra aqui que o lead qualificado vai.
-2. **Site WHITE**: cole um link normal (ex: um site de notícias). É pra aqui que bots, PCs e quem não cumpre os requisitos são redirecionados — parece uma página qualquer.
-3. **Campanha**: cole seu link de anúncio do TikTok Ads e clique em **+ Adicionar**. O requisito já vem escrito:
-   > `celular real + utm_source + utm_campaign + utm_medium + utm_content`
-
-### Passo 3 — Publique seus anúncios
-No TikTok Ads, use links assim:
-```
-https://seusite.com/?utm_source=tiktok&utm_campaign=campanha01&utm_medium=cpc&utm_content=criativo_a
-```
-(O cloaker intercepta na rota `/api/cloak/`, mas seu link pode ir direto pra raiz — o sistema funciona nos dois casos.)
+Proteja `https://importa-chiina.vercel.app/` dos bots do TikTok Ads Manager, serviços de espionagem, concorrentes e qualquer tráfego indesejado.
 
 ---
 
-## Regras fixas (não precisa configurar)
+## 🎯 COMO FUNCIONA (Estilo CloakUp / Therabot)
 
-| Quem chega | Vai pra |
-|---|---|
-| Celular real + params do anúncio completOS | **Site BLACK** ✅ |
-| Celular sem params completos | Site WHITE (disfarce) |
-| PC / Notebook | Site WHITE |
-| Bot (TikTok/Google/Facebook/ByteDance/scanner) | Site WHITE |
-| Emulador (BlueStacks, Genymotion...) | Site WHITE |
-| IP da whitelist (escritório / teste) | Site BLACK |
-| Token bypass (`/?bypass=xyz`) | Site BLACK |
+O CLOAKUP é um filtro de tráfego inteligente que fica na frente da sua oferta:
 
----
-
-## Monitoramento
-
-No painel (`/admin`), a aba **Log de acesso (tempo real)** mostra tudo que rola:
-
-| Hora | IP | Dispositivo | Decisão |
-|---|---|---|---|
-| 12:34 | 187.x.x.x | iPhone | ALLOWED (pra Black) |
-| 12:35 | 201.x.x.x | Windows | DECOY (pra White) |
-| 12:36 | 177.x.x.x | Bot | BOT_BLOCKED |
-
-E os 3 cartões no topo contam quantos cliques foram pro BLACK, quantos foram pro WHITE e quantos bots foram barrados.
-
----
-
-## Regras do anúncio (os requisitos)
-
-Para o clique ir pro site BLACK, o link tem que vir COMPLETO do TikTok Ads:
-
-- `utm_source=tiktok`
-- `utm_campaign=<nome_da_campanha>`
-- `utm_medium=cpc`
-- `utm_content=<nome_do_criativo>`
-
-Se faltar qualquer um desses, o clique cai no site WHITE. Isso evita clique de bot ou clique perdido.
-
----
-
-## Instalação
-
-```bash
-cd "C:\Users\User\Downloads\cloaker deep"
-npm install
-npm run dev
-# servidor em http://localhost:3000
+```
+TikTok Ads → LINK CUSTOMIZADO DO CLOAKUP → [Cascata de 12+ Filtros] → 
+    ✅ Mobile Real + Params TikTok → OFERTA (BLACK)
+    ❌ Bots / PC / Proxy / Espião / Geobloqueado → DISFARCE (WHITE)
 ```
 
-Acesse:
-- `http://localhost:3000/admin` — painel (site black, site white, campanhas)
-- `http://localhost:3000/health` — health check
-- `http://localhost:3000/api/logs` — logs brutos
+### 3 Etapas Simples
 
-## Deploy na Vercel
+#### 1️⃣ Adicione seu domínio
+Conecte sua oferta de forma rápida e fácil. No painel, defina:
+- **Site BLACK** = Sua oferta real (`https://importa-chiina.vercel.app/`)
+- **Site WHITE** = Seu disfarce (ex: `https://www.tiktok.com` ou site de notícias)
 
-```bash
-vercel deploy --prod
-```
+#### 2️⃣ Crie sua campanha
+Configure suas campanhas de marketing com filtros personalizados:
+- Filtre bots de análise e moderadores
+- Bloqueie proxies, VPNs e serviços de espionagem (AdSpy)
+- Defina geolocalização permitida/bloqueada
+- Escolha dispositivos aceitos (mobile-only recomendado)
+- Valide parâmetros de URL do TikTok Ads
+- Mantenha whitelist/blacklist de IPs
 
-O `vercel.json` já está configurado: funções nodejs em `/api/cloak/**` e rewrite para a função de cloaking.
+#### 3️⃣ Anuncie com link customizado
+Use os links customizados gerados automaticamente no painel. Cada clique é analisado e só o tráfego legítimo chega na sua oferta.
 
 ---
 
-## Estrutura
+## 🛡️ PRINCIPAIS FILTROS
+
+| Categoria | Descrição |
+|-----------|-----------|
+| **Bots** | Bloqueia bots do TikTok/ByteDance, Google, Facebook, crawlers, scanners (sqlmap, nikto), headless browsers (puppeteer, selenium, playwright) |
+| **Proxy/VPN** | Detecta e bloqueia tráfego de datacenters, VPs, proxies anônimos |
+| **AdSpy** | Bloqueia aplicativos de espionagem de anúncios (adspy, admonitor, etc.) |
+| **Geolocalização** | Permite/bloqueia por país (via Cloudflare, ALB, headers) |
+| **Dispositivos** | Mobile-only, desktop bloqueado, tablets, emuladores (BlueStacks, Genymotion) |
+| **Referência** | Valida se o tráfego veio de tiktok.com / vm.tiktok.com |
+| **Parâmetros de URL** | Exige utm_source, utm_campaign, utm_medium, utm_content |
+| **Linguagem do Navegador** | Filtra por Accept-Language (ex: só pt-BR, en-US) |
+| **User Agent** | Bloqueia UAs específicos ou padrões personalizados |
+| **ISP** | Bloqueia provedores de datacenter/conteúdo |
+| **Whitelist/Blacklist** | Sua própria lista de IPs permitidos ou bloqueados |
+
+---
+
+## 📁 ESTRUTURA DO PROJETO
 
 ```
 cloaker deep/
 ├── app/
 │   ├── api/
-│   │   ├── cloak/route.js    # NÚCLEO: decide quem entra (bot, mobile, params, token, whitelist)
-│   │   ├── config/           # le/gravam config e o site BLACK/WHITE
-│   │   ├── logs/             # auditoria de acesso
-│   │   └── lead/capture.js   # (opcional) captura de lead
-│   ├── admin/page.js         # painel simplificado
-│   ├── capture/page.js       # landing de captura (opcional)
-│   ├── health/route.js       # health check
-│   ├── layout.js
-│   └── page.js               # vitrine placeholder
+│   │   ├── cloak/
+│   │   │   ├── route.js          # NÚCLEO: engine de cloaking (cascade de filtros)
+│   │   │   └── token.js          # Gera token bypass estilo CloakUp
+│   │   ├── config/
+│   │   │   └── route.js          # CRUD completo de filtros
+│   │   ├── logs/
+│   │   │   └── route.js          # Auditoria de acessos em tempo real
+│   │   ├── lead/
+│   │   │   └── route.js          # Captura de leads (opcional)
+│   │   └── proxy/
+│   │       └── route.js          # Proxy de checkout (oculta link BLACK do referer)
+│   ├── admin/
+│   │   └── page.js               # PAINEL ADMINISTRATIVO (estilo CloakUp)
+│   ├── capture/
+│   │   └── page.js               # Landing de captura (modo moderate)
+│   ├── health/
+│   │   └── route.js              # Health check
+│   ├── page.js                   # Landing "3 etapas" (página inicial)
+│   └── layout.js                 # Layout global
+├── filters/
+│   ├── engine.js                 # Motor de cascade de filtros
+│   ├── bot-filter.js             # Filtro de bots
+│   ├── proxy-filter.js           # Filtro de proxy/VPN/datacenter
+│   ├── ads spy-filter.js         # Filtro de AdSpy
+│   ├── geo-filter.js             # Filtro de geolocalização
+│   ├── device-filter.js          # Filtro de dispositivos
+│   ├── referer-filter.js         # Filtro de referer
+│   ├── params-filter.js          # Filtro de parâmetros URL
+│   ├── lang-filter.js            # Filtro de linguagem
+│   ├── ua-filter.js              # Filtro de User Agent
+│   ├── isp-filter.js             # Filtro de ISP
+│   ├── whitelist-filter.js       # Whitelist/Blacklist de IPs
+│   └── decision.js               # Resolvedor de decisão final
 ├── utils/
-│   ├── ua.js                 # detecta bot / mobile / emulador
-│   └── utm.js                # valida params do anúncio
-├── .cloaker/config.json      # sua config (não versionar!)
+│   ├── ua.js                     # Detecção de bot/mobile/emulador
+│   ├── utm.js                    # Validação de params TikTok
+│   └── ip.js                     # Utilitários de IP/geolocalização
+├── .cloaker/
+│   ├── config.json               # CONFIGURAÇÕES COMPLETAS (privado)
+│   └── access.log                # LOGS DE ACESSO (privado)
 ├── package.json
-└── vercel.json
+├── vercel.json                   # Config de deploy
+├── start.bat                     # Iniciar localmente
+├── README.md                     # Este arquivo
+└── GUIA_USUARIO.md               # Manual completo do usuário
 ```
 
 ---
 
-## Segurança
+## 🚀 INSTALAÇÃO E RUN
 
-- Config e logs salvos em `.cloaker/` (fora do Git)
-- Token bypass assinado com JWT — só quem tem o link secreto entra
-- Proxy `/api/proxy/checkout` — se você redirecionar pro checkout, o TikTok nunca vê o link Black no referer
-- Whitelist de IPs pra acesso de escritório/ferramentas de monitoramento
+### Localmente
+
+```bash
+cd "C:\Users\User\Downloads\cloaker deep"
+npm install
+start.bat
+```
+
+Acesse:
+- `http://localhost:3000` → Landing "Como funciona" (3 etapas)
+- `http://localhost:3000/admin` → Painel administrativo (crie campanhas)
+- `http://localhost:3000/health` → Health check
+
+### Na Vercel
+
+```bash
+vercel deploy --prod
+```
+
+Ou importe o repositório no [vercel.com/new](https://vercel.com/new).
 
 ---
 
-## Customizar / Configurações extra
+## 🔗 LINK CUSTOMIZADO
 
-- **Site BLACK / WHITE**: painel (`/admin`) — altera em tempo real
-- **Bots bloqueados**: `.cloaker/config.json` → `strictTiktokBots` / `customBlockedUAs`
-- **Geo bloqueio (paises permitidos/bloqueados)**: `.cloaker/config.json` → `geoSettings` (ative com `"enabled": true`)
-- **Variveis de ambiente** (setup inicial, antes do painel): veja `.env.example` (`NEXT_PUBLIC_BLACK_URL`, `NEXT_PUBLIC_DECOY_URL`, `CLOAKER_MODE`, etc.)
-- **Token bypass**: gerado em `/admin` ou via `POST /api/cloak/token`
+Gerado automaticamente no painel `/admin`:
 
-© 2026 Cloaker Genérico.
+```
+https://SEU-CLOAKUP.vercel.app/api/cloak?utm_source=tiktok&utm_campaign=cam_XXXXX&utm_medium=cpc&utm_content=anti&campaign_id=cam_XXXXX
+```
+
+**Suba esse link no TikTok Ads como destino do anúncio.**
+
+### Regras para o clique ir pra OFERTA (BLACK):
+- ✅ Celular real (iPhone/Android)
+- ✅ Params completos: `utm_source=tiktok`, `utm_campaign`, `utm_medium=cpc`, `utm_content`
+- ✅ Referer do tiktok.com (opcional, reforça validação)
+
+**Qualquer outra combinação → DISFARCE (WHITE)**
+
+---
+
+## 🎪 PAINEL ADMINISTRATIVO
+
+Acesse `/admin` e veja:
+
+1. **Configuração da oferta**: Site BLACK + Site WHITE
+2. **Campanhas**: Crie, edite, exclua campanhas com links customizados
+3. **Filtros**: Ative/Desative e configure cada categoria de filtro
+4. **Logs em tempo real**: Atualiza a cada 3s com filtro por campanha
+5. **Stats**: Contagem de ALLOWED (BLACK), DECOY (WHITE), BLOCKED (bots)
+
+### Token Bypass
+Estilo CloakUp — URL secreta que libera qualquer dispositivo (para testes):
+
+```
+https://SEU-CLOAKUP.vercel.app/api/cloak?bypass=SEU_TOKEN_JWT
+```
+
+Gerado em `/admin` → Aba "Segurança" → "Gerar Token Bypass"
+
+---
+
+## 🔒 SEGURANÇA
+
+- Config e logs em `.cloaker/` (**nunca** no Git)
+- Token bypass JWT assinado — só quem tem o link secreto entra
+- Proxy `/api/proxy/checkout` — oculta o link BLACK do referer
+- Whitelist de IPs pra escritório/monitoramento
+- Proteção contra espionagem e crawlers
+
+---
+
+## 📋 COMANDOS RÁPIDOS
+
+```bash
+# Reiniciar servidor local
+cmd /c "cd /d C:\Users\User\Downloads\cloaker deep && start.bat"
+
+# Build para produção
+npm run build
+
+# Rodar na Vercel
+vercel deploy --prod
+```
+
+---
+
+## 🤝 BASEADO EM
+
+- **CloakUp** — Conceito de link customizado + filtros por campanha
+- **Therabot** — Cascade de filtros e decisão por campanha
+- **Clocap** — Token bypass estilo JWT
+
+© 2026 CLOAKUP — Proteção de Tráfego para TikTok Ads.

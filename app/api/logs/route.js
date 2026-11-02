@@ -1,14 +1,13 @@
-// language: JavaScript, file: app/api/logs/index.js, target: Next.js 14, Vercel
-// *API endpoint: GET /api/logs — retorna os logs de acesso do cloaker.
-//  POST /api/logs — grava um novo log de acesso.
-
+// ============================================================
+// CLOAKUP - API de Logs (Auditoria em Tempo Real)
+// ============================================================
 import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server.js';
 
 const STORAGE_DIR = path.join(process.cwd(), '.cloaker');
 const LOGS_PATH = path.join(STORAGE_DIR, 'access.log');
-const MAX_LOG_ENTRIES = 2000;
+const MAX_LOG_ENTRIES = 500;
 
 export async function POST(request) {
   try {
@@ -24,20 +23,17 @@ export async function POST(request) {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
     }) + '\n';
 
-    // Append ao log (rotação simples: mantem apenas os ultimos MAX entries em memoria tambem)
     fs.appendFileSync(LOGS_PATH, logLine, 'utf8');
 
-    // Mantem log file com tamanho razoavel (corta os ultimos 500 se ultrapassar ~1MB)
+    // Rotação simples
     try {
       const stat = fs.statSync(LOGS_PATH);
       if (stat.size > 1024 * 1024) {
         const lines = fs.readFileSync(LOGS_PATH, 'utf8').split('\n').filter(Boolean);
-        const kept = lines.slice(-500);
+        const kept = lines.slice(-MAX_LOG_ENTRIES);
         fs.writeFileSync(LOGS_PATH, kept.join('\n') + '\n', 'utf8');
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch (e) { /* ignore */ }
 
     return NextResponse.json({ success: true, id: timestamp });
   } catch (error) {
@@ -47,7 +43,7 @@ export async function POST(request) {
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const limit = parseInt(searchParams.get('limit') || '50', 10);
+  const limit = parseInt(searchParams.get('limit') || '100', 10);
 
   if (!fs.existsSync(LOGS_PATH)) {
     return NextResponse.json({ logs: [], total: 0 });

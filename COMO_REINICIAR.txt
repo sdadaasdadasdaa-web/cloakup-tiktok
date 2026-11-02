@@ -1,0 +1,70 @@
+==========================================================
+COMO REINICIAR O SERVIDOR (Solução para spawn EPERM)
+==========================================================
+
+O erro "spawn EPERM" é um bloqueio do shell desta ferramenta,
+NÃO do seu Windows. O servidor roda normalmente no SEU terminal.
+
+==========================================================
+PASSO A PASSO:
+==========================================================
+
+1. Abra um terminal CMD ou PowerShell NO SEU computador
+
+2. Navegue até a pasta do projeto:
+   
+   cd "C:\Users\User\Downloads\cloaker deep"
+
+3. Rode o servidor (modo desenvolvimento):
+
+   npm run dev
+
+4. Aguarde... vai aparecer:
+   
+   ✓ Ready in X ms
+   ○ Local: http://localhost:3000
+
+5. Acesse no SEU navegador:
+   
+   http://localhost:3000     -> vitrine
+   http://localhost:3000/admin -> painel de configuracao
+   http://localhost:3000/health -> health check
+
+==========================================================
+Se o "npm run dev" náo funcionar:
+==========================================================
+
+a) Verifique se tem Node.js instalado:
+
+   node --version
+   
+   (Deve retornar v18.0.0 ou superior)
+
+b) Se aparecer "npm not found", instale o Node.js em:
+   https://nodejs.org
+
+c) Se aparecer erro de build, rode primeiro:
+
+   npm install
+   npm run dev
+
+==========================================================
+O servidor anterior (PID 25020) foi fechado por mim.
+==========================================================
+
+Se voc^e tinha um terminal com "npm run dev" rodando antes,
+ele foi interrompido quando parei o processo. Precisamos
+reiniciar em um terminal NOVO.
+
+==========================================================
+Modo FALLBACK (se nada mais funcionar):
+==========================================================
+
+Rode no SEU terminal:
+
+   npm run fallback
+
+Serve as rotas API (/api/*) mas NAO o painel /admin interativo.
+Apenas como ultimo recurso.
+
+==========================================================

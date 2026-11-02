@@ -7,7 +7,7 @@
     {
       "source": "/api/cloak/(.*)",
       "headers": [
-        { "key": "X-Cloaker-Version", "value": "1.0.0" }
+        { "key": "X-CloakUp-Version", "value": "2.0.0" }
       ]
     },
     {
@@ -20,6 +20,13 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "NEXT_PUBLIC_CLOAK_UP_ID": "cloakup-tiktok-ads-2.0"
+  },
+  "functions": {
+    "/api/cloak/*": {
+      "memory": 512,
+      "maxDuration": 30
+    }
   }
 }

@@ -2,6 +2,7 @@
 // *Valida a cadeia de parâmetros do anúncio do TikTok.
 //  Configurações adaptáveis pela interface de admin*
 
+
 import { parse as parseUrl } from 'url';
 
 const TIKTOK_REQUIRED_UTM = ['utm_source', 'utm_campaign', 'utm_medium', 'utm_content'];
