@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Rápido do Cloaker</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #0f0f0f; color: #fff; padding: 20px; }
+    h1 { color: #4cd137; }
+    .box { background: #1a1a1a; padding: 15px; border-radius: 8px; margin: 10px 0; border: 1px solid #333; }
+    button { background: #4cd137; color: #000; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold; margin: 5px; }
+    button:hover { opacity: 0.9; }
+    .result { background: #14291d; padding: 10px; border-radius: 5px; margin-top: 10px; border-left: 4px solid #4cd137; }
+    .result.err { border-left-color: #e84118; background: #291414; }
+    .result.ok { border-left-color: #4cd137; background: #14291d; }
+    code { background: #000; padding: 2px 6px; border-radius: 3px; color: #4cd137; }
+  </style>
+</head>
+<body>
+  <h1>🧪 TESTE RÁPIDO DO CLOAKER</h1>
+  <p>Seu IP: <strong id="ip">?</strong></p>
+
+  <div class="box">
+    <h2>Testar link da campanha cam_bs3mpc</h2>
+    <p>Quem clica desse dispositivo vai pra onde?</p>
+    <div id="link-box">
+      <p>Clique no botão para abrir o link do TikTok Ads:</p>
+      <button onclick="abrirLink(true)">🔗 ABRIR LINK (simula clique do TikTok)</button>
+      <button onclick="copiarLink()">📋 COPIAR LINK</button>
+    </div>
+    <div id="status" class="result" style="display:none;"></div>
+  </div>
+
+  <div class="box">
+    <h2>Teste manual de User-Agent</h2>
+    <button onclick="testar('iPhone 14')">📱 iPhone 14 (iOS 17)</button>
+    <button onclick="testar('Android 14')">📱 Android 14 (Chrome Mobile)</button>
+    <button onclick="testar('Windows Chrome 120')">💻 PC Windows Chrome 120</button>
+    <button onclick="testar('macOS Safari 17')">💻 PC Mac Safari 17</button>
+    <button onclick="testar('TikTok Ads Manager')">🤖 Bot TikTok Ads</button>
+  </div>
+
+  <div class="box">
+    <h2>Resultados</h2>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    const CLOAKER = "http://127.0.0.1:3000/api/cloak";
+    const CAMPAIGN_ID = "cam_bs3mpc";
+    document.getElementById("ip").innerText = "127.0.0.1 (localhost)";
+
+    const link = `${CLOAKER}?utm_source=tiktok&utm_campaign=${CAMPAIGN_ID}&utm_medium=cpc&utm_content=anti&campaign_id=${CAMPAIGN_ID}`;
+    document.getElementById("link-box").innerHTML = `
+      <p><strong>Link da campanha:</strong></p>
+      <code style="display:block; word-break:break-all; margin: 8px 0; font-size: 11px;">${link}</code>
+      <button onclick="abrirLink(true)">🔗 ABRIR LINK (simula clique do TikTok)</button>
+      <button onclick="copiarLink()">📋 COPIAR LINK</button>
+      <button onclick="verificarDireto()">🔍 VERIFICAR AGORA (sem abrir)</button>
+    `;
+
+    function abrirLink(novaAba) {
+      if (novaAba) {
+        window.open(link, "_blank");
+      }
+      verificarDireto();
+    }
+
+    function copiarLink() {
+      navigator.clipboard.writeText(link).then(() => {
+        mostrarStatus("Link copiado!", "ok");
+      });
+    }
+
+    function verificarDireto() {
+      mostrarStatus("Verificando...", "");
+      fetch(link)
+        .then(r => {
+          const loc = r.headers.get("location");
+          const decision = r.headers.get("x-cloaker-decision") || "NENHUMA";
+          const ok = r.status === 302;
+          mostrarStatus(
+            `Status: ${r.status} | Decision: ${decision}\nLocalização: ${loc || "NENHUM"}`,
+            ok ? "ok" : "err"
+          );
+        })
+        .catch(e => {
+          mostrarStatus(`ERRO: ${e.message}`, "err");
+        });
+    }
+
+    function testar(tipo) {
+      let ua;
+      switch (tipo) {
+        case "iPhone 14":
+          ua = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
+          break;
+        case "Android 14":
+          ua = "Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
+          break;
+        case "Windows Chrome 120":
+          ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+          break;
+        case "macOS Safari 17":
+          ua = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15";
+          break;
+        case "TikTok Ads Manager":
+          ua = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
+          break;
+      }
+      const url = `${CLOAKER}?utm_source=tiktok&utm_campaign=${CAMPAIGN_ID}&utm_medium=cpc&utm_content=anti&campaign_id=${CAMPAIGN_ID}`;
+      fetch(url, { headers: { "User-Agent": ua } })
+        .then(r => {
+          const loc = r.headers.get("location");
+          const decision = r.headers.get("x-cloaker-decision") || "NENHUMA";
+          const div = document.createElement("div");
+          div.className = "result " + (loc && loc.includes("tiktok") ? "ok" : "ok");
+          div.innerHTML = `<strong>${tipo}</strong><br>Status: ${r.status} | Decision: ${decision}<br>Vai pra: ${loc || "NENHUM"}`;
+          document.getElementById("results").appendChild(div);
+        })
+        .catch(e => {
+          const div = document.createElement("div");
+          div.className = "result err";
+          div.innerHTML = `<strong>${tipo}</strong><br>ERRO: ${e.message}`;
+          document.getElementById("results").appendChild(div);
+        });
+    }
+
+    function mostrarStatus(msg, tipo) {
+      const el = document.getElementById("status");
+      el.style.display = "block";
+      el.className = "result " + tipo;
+      el.innerText = msg;
+    }
+  </script>
+</body>
+</html>
