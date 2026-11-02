@@ -3,18 +3,6 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "installCommand": "npm install",
-  "functions": {
-    "app/api/cloak/**/*": {
-      "runtime": "nodejs18.x",
-      "memory": 1024,
-      "maxDuration": 60,
-      "includeFiles": ".cloaker/**"
-    },
-    "app/api/**/*": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
-  },
   "headers": [
     {
       "source": "/api/cloak/(.*)",
