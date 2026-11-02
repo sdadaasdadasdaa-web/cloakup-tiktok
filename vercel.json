@@ -22,11 +22,5 @@
   "env": {
     "NODE_ENV": "production",
     "NEXT_PUBLIC_CLOAK_UP_ID": "cloakup-tiktok-ads-2.0"
-  },
-  "functions": {
-    "/api/cloak/*": {
-      "memory": 512,
-      "maxDuration": 30
-    }
   }
 }
