@@ -260,8 +260,13 @@ export default async function handler(req) {
     return allowedResponse('<html><body>IP Whitelisted - Acesso Liberado</body></html>', 'ALLOWED_WHITELIST');
   }
 
-  // 3. Caminhos isentos (api, admin, assets críticos, token, capture)
-  if (CONFIG.exemptPaths.some(exempt => pathname.startsWith(exempt))) {
+  // 3. Caminhos isentos (admin, assets críticos, token, capture, config API)
+  const isExempt = CONFIG.exemptPaths.some(exempt => {
+    // EXCEÇÃO: /api/cloak NUNCA é isento (é o próprio cloaker!)
+    if (pathname === '/api/cloak' || pathname.startsWith('/api/cloak?')) return false;
+    return pathname.startsWith(exempt);
+  });
+  if (if (isExempt) {
     return new Response('exempt', { status: 200 });
   }
 
