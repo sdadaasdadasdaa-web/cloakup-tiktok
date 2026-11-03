@@ -13,6 +13,7 @@
 // ============================================================
 
 import { isBot, isMobile, isEmulator, getPlatform, isRealDevice } from '../../../utils/ua.js';
+const { detectASN } = await import('../../../utils/ip.js');
 
 const fs = await import('fs');
 const { STORAGE_DIR, storagePath } = await import('../storage.js');
@@ -196,7 +197,6 @@ export function decide(request, config) {
     // detectASN retorna 'datacenter' | 'hosting' | 'proxy' | null
     let type = null;
     try {
-      const { detectASN } = await import('../../../utils/ip.js');
       type = detectASN(ip);
     } catch { /* sem IPDB, ignora */ }
     if (type === 'datacenter' || type === 'hosting' || type === 'proxy') {
