@@ -61,15 +61,23 @@ const DEFAULT_CONFIG = {
 
 // Funções expostas para debug / testes
 export function readConfig() {
+  // 1) Variaveis de ambiente (Vercel dashboard) - SEMPRE sobrepoe (se definidas)
+  const envConfig = {};
+  if (process.env.CLOAKER_BLACK_URL) envConfig.blackUrl = process.env.CLOAKER_BLACK_URL;
+  if (process.env.CLOAKER_WHITE_URL) envConfig.whiteUrl = process.env.CLOAKER_WHITE_URL;
+
+  // 2) Arquivo config do .cloaker (config base commitada) - lida com erro, nao falha
+  const fileConfig = {};
   try {
     if (fs.existsSync(CONFIG_PATH)) {
       const loaded = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
-      return { ...DEFAULT_CONFIG, ...loaded };
+      Object.assign(fileConfig, loaded);
     }
-  } catch { /* ignore */ }
-  return { ...DEFAULT_CONFIG };
-}
+  } catch { /* json invalido ou ausencia -> ignora */ }
 
+  // Merge: default < file < env (env só conta se definida, pra nao sobrescrever com undefined)
+  return { ...DEFAULT_CONFIG, ...fileConfig, ...envConfig };
+}
 // ============================================================
 // LOGGING (apenas auditoria, nunca bloqueia)
 // ============================================================

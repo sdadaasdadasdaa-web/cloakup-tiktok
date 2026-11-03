@@ -3,9 +3,12 @@ node_modules/
 .next/
 out/
 
-# Storage privado do cloaker (config, logs, leads)
-.cloaker/
-.bypass_secret.txt
+# Storage privado do cloaker
+# - .cloaker/config.json: configuracao base do cloaker (COMMITADO — usado no deploy)
+# - .cloaker/bypass_secret.txt: segredo de bypass (COMMITADO)
+# - .cloaker/access.log: LOGS DE ACESSO (nao commitados — gravados em /tmp no runtime)
+.cloaker/access.log
+.cloaker/*.log
 
 # Environment
 .env
