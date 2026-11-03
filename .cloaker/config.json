@@ -32,14 +32,22 @@
     "blockedCountries": []
   },
   "forceMobileOnly": true,
-  "refererEnabled": true,
-  "paramsEnabled": true,
+  "proxyEnabled": false,
+  "adsSpyEnabled": false,
+  "geoEnabled": false,
+  "refererEnabled": false,
+  "paramsEnabled": false,
   "langEnabled": false,
-  "allowedLanguages": [],
   "uaEnabled": false,
-  "uaPatterns": [],
   "ispEnabled": false,
   "bypassParam": "bypass",
   "bypassSessionLifetime": 2592000,
-  "campaigns": []
+  "campaigns": [
+    {
+      "campaignId": "cam_b2qv9bu",
+      "active": true,
+      "blackUrl": "https://importa-chiina.vercel.app/",
+      "whiteUrl": "https://www.mundo-surf.com/pt/news/prancha-de-surf/guia-completo-iniciante-surf"
+    }
+  ]
 }

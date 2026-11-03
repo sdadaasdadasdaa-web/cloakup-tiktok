@@ -2,17 +2,18 @@
 // CLOAKUP - Endpoint Principal de Cloaking
 // Rota: /api/cloak/*
 // ============================================================
-// LÓGICA SIMPLES - Apenas 2 destinos possíveis:
+// LÓGICA SIMPLES - Apenas 2 DESTINOS POSSÍVEIS:
 //
-//   Desktop/PC (Windows / macOS / Linux / tablet desktop)  -> WHITE URL (pagina branca / decoy)
-//   Mobile (Android / iOS / qualquer celular)              -> BLACK URL (site preto / oferta)
-//   Bots, crawlers, spiders, scripts, headless            -> WHITE URL
+//   1. Bots, crawlers, robots, headless -> WHITE URL
+//   2. Desktop/PC (Windows / Mac / Linux) -> WHITE URL
+//   3. Mobile (Android / iOS / qualquer celular) -> BLACK URL
 //
+// SOMENTE 2 DESTINOS: whiteUrl e blackUrl.
 // NADA de tela de bloqueio, NADA de redirecionar para TikTok,
-// NADA de conectar ao sistema de bloqueio.
+// NADA de intermediação.
 // ============================================================
 
-import { isBot, isMobile, isEmulator, getPlatform, isRealDevice } from '../../../utils/ua.js';
+import { isBot, isEmulator, getPlatform } from '../../../utils/ua.js';
 const { detectASN } = await import('../../../utils/ip.js');
 
 const fs = await import('fs');
@@ -24,12 +25,10 @@ const LOGS_PATH = storagePath('access.log');
 const DEFAULT_CONFIG = {
   brandName: 'CLOAKUP',
   brandSlogan: 'Proteção de tráfego de alto nível para TikTok Ads',
-  mode: 'moderate',
 
   blackUrl: '',
   whiteUrl: 'https://www.tiktok.com',
   decoyUrl: 'https://www.tiktok.com',
-  leadCaptureUrl: '/capture',
 
   whitelistEnabled: true,
   whitelistIPs: [],
@@ -44,24 +43,14 @@ const DEFAULT_CONFIG = {
   customBlockedUAs: [],
   blockEmulators: true,
 
-  proxyEnabled: true,
-
-  adsSpyEnabled: true,
-
-  geoEnabled: true,
-  geoSettings: {
-    allowedCountries: [],
-    blockedCountries: [],
-  },
-
-  forceMobileOnly: true,
-
-  refererEnabled: true,
-  paramsEnabled: true,
+  // Filtros opcionais - desligados por padrão para a regra ser SIMPLES (só dispositivo + bot)
+  proxyEnabled: false,
+  adsSpyEnabled: false,
+  geoEnabled: false,
+  refererEnabled: false,
+  paramsEnabled: false,
   langEnabled: false,
-  allowedLanguages: [],
   uaEnabled: false,
-  uaPatterns: [],
   ispEnabled: false,
 
   bypassParam: 'bypass',
@@ -70,7 +59,8 @@ const DEFAULT_CONFIG = {
   campaigns: [],
 };
 
-function readConfig() {
+// Funções expostas para debug / testes
+export function readConfig() {
   try {
     if (fs.existsSync(CONFIG_PATH)) {
       const loaded = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8'));
@@ -81,21 +71,20 @@ function readConfig() {
 }
 
 // ============================================================
-// LOGGING (apenas para auditoria, nunca bloqueia a resposta)
+// LOGGING (apenas auditoria, nunca bloqueia)
 // ============================================================
-async function logDecision(request, result) {
+export async function logDecision(request, result) {
   const ua = request.headers.get('user-agent') || '';
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
              request.headers.get('x-real-ip') ||
              request.socket?.remoteAddress || 'unknown';
-  const platform = result.platform || 'unknown';
 
   const logEntry = {
     event: 'access',
     decision: result.decision,
     reason: result.reason,
     ip,
-    platform,
+    platform: result.platform || 'unknown',
     campaign_id: new URL(request.url).searchParams.get('campaign_id'),
     filters: result.filters || [],
     ua: ua.slice(0, 200),
@@ -125,7 +114,7 @@ export function decide(request, config) {
     filters: [],
   };
 
-  // --- 0. Token de bypass (permite acessar o site BLACK diretamente, util para voce) ---
+  // --- 1. Token de bypass (permite ir direto para o BLACK - util para voce) ---
   const bypass = new URL(request.url).searchParams.get(config.bypassParam) ||
                  new URL(request.url).searchParams.get('token');
   if (bypass) {
@@ -135,7 +124,7 @@ export function decide(request, config) {
     return result;
   }
 
-  // --- 1. Whitelist de IPs (ACESSO LIBERADO ao BLACK - ex: admin) ---
+  // --- 2. Whitelist de IPs (ACESSO ao BLACK - ex: voce/admin) ---
   const ip = (request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
               request.headers.get('x-real-ip') || 'unknown');
   if (config.whitelistEnabled && config.whitelistIPs.includes(ip)) {
@@ -145,11 +134,10 @@ export function decide(request, config) {
     return result;
   }
 
-  // --- 2. Detecção de bot / crawler / robot / script / headless ---
-  //    Tudo que é automatizado vai para o WHITE (pagina decoy)
+  // --- 3. Detecção de bot / crawler / robot / script / headless -> WHITE ---
   let detectedBot = null;
 
-  // Bots declarados de redes sociais (TikTok Ads, FB, Google...)
+  // Bots das redes sociais / anuncios
   for (const sig of config.strictTiktokBots || []) {
     if (uaLower.includes(sig.toLowerCase())) {
       detectedBot = 'TIKTOK_' + sig.replace(/\s/g, '_');
@@ -157,7 +145,6 @@ export function decide(request, config) {
     }
   }
 
-  // Bots genéricos (Googlebot, Bingbot, scanners, headless, python, curl, etc)
   if (!detectedBot) {
     const botCheck = isBot(ua, { ignoreBots: [] });
     if (botCheck.isBot) {
@@ -165,7 +152,6 @@ export function decide(request, config) {
     }
   }
 
-  // Bots custom configuraveis
   if (!detectedBot) {
     for (const custom of config.customBlockedUAs || []) {
       if (uaLower.includes(custom.toLowerCase())) {
@@ -182,8 +168,7 @@ export function decide(request, config) {
     return result;
   }
 
-  // --- 3. Emuladores (Bluestacks, Nox, LDPlayer...) ---
-  //    Vao para o WHITE, nao entram na oferta
+  // --- 4. Emuladores -> WHITE ---
   if (config.blockEmulators && isEmulator(ua)) {
     result.decision = 'WHITE';
     result.reason = 'EMULATOR';
@@ -191,24 +176,22 @@ export function decide(request, config) {
     return result;
   }
 
-  // --- 4. Proxy / VPN / Datacenter ---
-  //    Se estiver configurado, redireciona pro WHITE em vez de bloquear
+  // --- 5. Proxy / VPN / Datacenter (OPCIONAL) -> WHITE se ativo ---
+  //    Desligado por padrao para manter a regra SIMPLES
   if (config.proxyEnabled) {
-    // detectASN retorna 'datacenter' | 'hosting' | 'proxy' | null
-    let type = null;
     try {
-      type = detectASN(ip);
+      const type = detectASN(ip);
+      if (type === 'datacenter' || type === 'hosting' || type === 'proxy') {
+        result.decision = 'WHITE';
+        result.reason = type.toUpperCase();
+        result.filters.push('proxy');
+        return result;
+      }
     } catch { /* sem IPDB, ignora */ }
-    if (type === 'datacenter' || type === 'hosting' || type === 'proxy') {
-      result.decision = 'WHITE';
-      result.reason = type.toUpperCase();
-      result.filters.push('proxy');
-      return result;
-    }
   }
 
-  // --- 5. Geolocalização (se ativa) ---
-  //    Paises bloqueados -> WHITE. Paises permitidos -> BLACK.
+  // --- 6. Geolocalizacao (OPCIONAL) -> WHITE se pais bloqueado/permitido ---
+  //    Desligado por padrao para manter a regra SIMPLES
   if (config.geoEnabled) {
     let country = request.headers.get('cf-ipcountry') ||
                   request.headers.get('x-geocluster') ||
@@ -223,7 +206,7 @@ export function decide(request, config) {
         const { allowedCountries, blockedCountries } = config.geoSettings;
         if (blockedCountries.includes(country)) {
           result.decision = 'WHITE';
-          result.reason = 'GEO_BLOCKED_COUNTRY_' + country;
+          result.reason = 'GEO_BLOCKED_' + country;
           result.filters.push('geo');
           return result;
         }
@@ -237,78 +220,14 @@ export function decide(request, config) {
     }
   }
 
-  // --- 6. Referer (opcional) ---
-  //    Se referer não for das redes permitidas -> WHITE
-  if (config.refererEnabled) {
-    const referer = request.headers.get('referer') || request.headers.get('referrer');
-    let host = null;
-    if (referer) {
-      try { host = new URL(referer).host; } catch { /* ignora */ }
-    }
-    if (!host) {
-      result.decision = 'WHITE';
-      result.reason = 'REFERER_MISSING';
-      result.filters.push('referer');
-      return result;
-    }
-    const allowedHosts = ['tiktok.com', 'www.tiktok.com', 'vm.tiktok.com', 'vt.tiktok.com', 'm.tiktok.com', 'tiktok.us'];
-    if (!allowedHosts.includes(host)) {
-      result.decision = 'WHITE';
-      result.reason = 'REFERER_INVALID_' + host;
-      result.filters.push('referer');
-      return result;
-    }
-  }
-
-  // --- 7. Parâmetros de URL (opcional) ---
-  //    Sem params de ad -> WHITE
-  if (config.paramsEnabled) {
-    const params = new URL(request.url).searchParams;
-    const hasParams = params.has('utm_source') || params.has('campaign_id') ||
-                      params.has('ad_id') || params.has('adsetId');
-    if (!hasParams) {
-      result.decision = 'WHITE';
-      result.reason = 'PARAMS_MISSING';
-      result.filters.push('params');
-      return result;
-    }
-  }
-
-  // --- 8. Idioma (opcional) ---
-  if (config.langEnabled) {
-    const acceptLang = request.headers.get('accept-language');
-    if (acceptLang) {
-      const lang = acceptLang.split(',')[0].split('-')[0].toLowerCase();
-      const allowedLanguages = config.allowedLanguages || [];
-      if (allowedLanguages.length && !allowedLanguages.includes(lang)) {
-        result.decision = 'WHITE';
-        result.reason = 'LANGUAGE_' + lang;
-        result.filters.push('lang');
-        return result;
-      }
-    }
-  }
-
-  // --- 9. User Agent custom (opcional) ---
-  if (config.uaEnabled) {
-    const uaPatterns = config.uaPatterns || [];
-    for (const pattern of uaPatterns) {
-      if (pattern.test && pattern.test(uaLower)) {
-        result.decision = 'WHITE';
-        result.reason = 'UA_CUSTOM';
-        result.filters.push('ua');
-        return result;
-      }
-    }
-  }
-
   // ============================================================
-  // DECISÃO FINAL POR DISPOSITIVO
+  // DECISAO FINAL POR DISPOSITIVO (REGRAS PRINCIPAIS)
   // ============================================================
   const platform = getPlatform(ua);
 
-  // Desktop, Mac, Linux, tablet desktop, console -> WHITE (pagina decoy / protegida)
-  if (platform === 'desktop' || platform === 'mac' || platform === 'linux' || platform === 'windows' || platform === 'console') {
+  // Desktop, Mac, Linux, tablet desktop, console -> WHITE
+  if (platform === 'desktop' || platform === 'mac' || platform === 'linux' ||
+      platform === 'windows' || platform === 'console') {
     result.decision = 'WHITE';
     result.reason = 'DESKTOP';
     result.platform = platform;
@@ -316,7 +235,7 @@ export function decide(request, config) {
     return result;
   }
 
-  // Mobile real (Android, iOS, celular) -> BLACK (site preto / oferta)
+  // Mobile real (Android, iOS) -> BLACK
   if (platform === 'mobile') {
     result.decision = 'BLACK';
     result.reason = 'MOBILE_REAL';
@@ -325,18 +244,18 @@ export function decide(request, config) {
     return result;
   }
 
-  // Qualquer outra assinatura (UA desconhecido, mobile ambiguous) -> WHITE por padrao
+  // Qualquer UA desconhecido -> WHITE (padrao seguro)
   result.decision = 'WHITE';
-  result.reason = 'UNKNOWN_PLATFORM';
+  result.reason = 'UNKNOWN';
   result.platform = platform || 'unknown';
   result.filters.push('default');
   return result;
 }
 
 // ============================================================
-// REDIRECIONAMENTO
+// REDIRECIONAMENTO - resolve WHITE ou BLACK
 // ============================================================
-function resolveTarget(request, decision, config) {
+export function resolveTarget(request, decision, config) {
   const campaignId = new URL(request.url).searchParams.get('campaign_id');
 
   if (decision === 'BLACK') {
@@ -347,7 +266,7 @@ function resolveTarget(request, decision, config) {
     return config.blackUrl || 'https://www.tiktok.com';
   }
 
-  // WHITE por padrão
+  // WHITE (padrao)
   if (campaignId) {
     const camp = config.campaigns.find(c => String(c.campaignId) === String(campaignId));
     if (camp && camp.whiteUrl) return camp.whiteUrl;
@@ -366,10 +285,10 @@ export default async function handler(request) {
   const config = readConfig();
   const result = decide(request, config);
 
-  // Log da decisão (assíncrono, não bloqueia)
+  // Log da decisão (assincrono, nao bloqueia)
   logDecision(request, result).catch(() => {});
 
-  // Redireciona para o destino correto: WHITE ou BLACK
+  // Redireciona para o destino correto
   const target = resolveTarget(request, result.decision, config);
 
   return Response.redirect(target, 302);
