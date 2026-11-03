@@ -24,7 +24,7 @@
     "NEXT_PUBLIC_CLOAK_UP_ID": "cloakup-tiktok-ads-2.0"
   },
   "functions": {
-    "api/cloak/*": {
+    "app/api/cloak/route.js": {
       "memory": 512,
       "maxDuration": 30
     }
