@@ -3,11 +3,10 @@
 // Estilo CloakUp - Gerencie todos os filtros
 // ============================================================
 import fs from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server.js';
+import { STORAGE_DIR, storagePath, getFallbackPath } from '../storage.js';
 
-const STORAGE_DIR = path.join(process.cwd(), '.cloaker');
-const STORAGE_PATH = path.join(STORAGE_DIR, 'config.json');
+const STORAGE_PATH = storagePath('config.json');
 
 const DEFAULT_CONFIG = {
   brandName: 'CLOAKUP',
@@ -49,6 +48,12 @@ function readConfig() {
   try {
     if (fs.existsSync(STORAGE_DIR) && fs.existsSync(STORAGE_PATH)) {
       const loaded = JSON.parse(fs.readFileSync(STORAGE_PATH, 'utf8'));
+      return { ...DEFAULT_CONFIG, ...loaded };
+    }
+    // fallback: .cloaker commitado no repositorio (opcional, para persistencia entre deploys)
+    const alt = getFallbackPath('config.json');
+    if (fs.existsSync(alt)) {
+      const loaded = JSON.parse(fs.readFileSync(alt, 'utf8'));
       return { ...DEFAULT_CONFIG, ...loaded };
     }
   } catch { /* ignore */ }

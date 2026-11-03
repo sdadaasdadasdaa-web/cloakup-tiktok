@@ -10,23 +10,9 @@ import { NextResponse } from 'next/server.js';
 import jwt from 'jsonwebtoken';
 import { writeFileSync, readFileSync } from 'fs';
 import { dirname, join } from 'path';
+import { STORAGE_DIR, storagePath } from '../storage.js';
 
-const STORAGE_DIR = join(process.cwd(), '.cloaker');
-
-async function ensureSecret() {
-  try {
-    return readFileSync(join(STORAGE_DIR, 'bypass_secret.txt'), 'utf8').trim();
-  } catch {
-    // Segredo nao existe -> gera um novo
-    const crypto = await import('crypto');
-    const secret = crypto.randomBytes(32).toString('base64');
-    if (!require('fs').existsSync(STORAGE_DIR)) {
-      require('fs').mkdirSync(STORAGE_DIR, { recursive: true });
-    }
-    writeFileSync(join(STORAGE_DIR, 'bypass_secret.txt'), secret, 'utf8');
-    return secret;
-  }
-}
+const SECRET_PATH = storagePath('bypass_secret.txt');
 
 export async function POST(request) {
   try {

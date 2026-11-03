@@ -5,11 +5,11 @@
 import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server.js';
+import { STORAGE_DIR, storagePath } from '../storage.js';
 
-const STORAGE_DIR = path.join(process.cwd(), '.cloaker');
-const SECRET_PATH = path.join(STORAGE_DIR, 'bypass_secret.txt');
+const SECRET_PATH = storagePath('bypass_secret.txt');
 
-function getSecret() {
+async function getSecret() {
   try {
     if (fs.existsSync(SECRET_PATH)) {
       return fs.readFileSync(SECRET_PATH, 'utf8').trim();
@@ -26,7 +26,7 @@ function getSecret() {
   return secret;
 }
 
-function generateToken(secret, payload) {
+async function generateToken(secret, payload) {
   const jwt = await import('jsonwebtoken');
   return jwt.jwt.sign(payload, secret, { expiresIn: payload.exp ? '30d' : '30d' });
 }

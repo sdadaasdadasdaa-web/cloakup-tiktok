@@ -23,15 +23,10 @@ import { FilterEngine } from '../../../filters/engine.js';
 import { getCampaign } from '../../../filters/decisions.js';
 
 const fs = await import('fs');
-const pathModule = await import('path');
+const { STORAGE_DIR, storagePath } = await import('../storage.js');
 
-function join(base, file) {
-  return base + '/' + file.replace(/^\//, '');
-}
-
-const STORAGE_DIR = join(process.cwd(), '.cloaker');
-const CONFIG_PATH = join(STORAGE_DIR, 'config.json');
-const LOGS_PATH = join(STORAGE_DIR, 'access.log');
+const CONFIG_PATH = storagePath('config.json');
+const LOGS_PATH = storagePath('access.log');
 
 // ============================================================
 // LEITURA DE CONFIGURAÇÃO

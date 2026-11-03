@@ -5,9 +5,9 @@
 import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server.js';
+import { STORAGE_DIR, storagePath } from '../storage.js';
 
-const STORAGE_DIR = path.join(process.cwd(), '.cloaker');
-const LEADS_PATH = path.join(STORAGE_DIR, 'leads.json');
+const LEADS_PATH = storagePath('leads.json');
 
 export async function POST(request) {
   try {

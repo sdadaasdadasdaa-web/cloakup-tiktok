@@ -6,9 +6,9 @@
 import { NextResponse } from 'next/server.js';
 import fs from 'fs';
 import path from 'path';
+import { STORAGE_DIR, storagePath } from '../storage.js';
 
-const STORAGE_DIR = path.join(process.cwd(), '.cloaker');
-const STORAGE_PATH = path.join(STORAGE_DIR, 'config.json');
+const STORAGE_PATH = storagePath('config.json');
 
 const DEFAULT_CONFIG = {
   brandName: 'CLOAKUP',

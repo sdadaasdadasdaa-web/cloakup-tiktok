@@ -2,11 +2,10 @@
 // CLOAKUP - API de Logs (Auditoria em Tempo Real)
 // ============================================================
 import fs from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server.js';
+import { STORAGE_DIR, storagePath } from '../storage.js';
 
-const STORAGE_DIR = path.join(process.cwd(), '.cloaker');
-const LOGS_PATH = path.join(STORAGE_DIR, 'access.log');
+const LOGS_PATH = storagePath('access.log');
 const MAX_LOG_ENTRIES = 500;
 
 export async function POST(request) {
@@ -14,7 +13,6 @@ export async function POST(request) {
     if (!fs.existsSync(STORAGE_DIR)) {
       fs.mkdirSync(STORAGE_DIR, { recursive: true });
     }
-
     const entry = await request.json();
     const timestamp = new Date().toISOString();
     const logLine = JSON.stringify({
