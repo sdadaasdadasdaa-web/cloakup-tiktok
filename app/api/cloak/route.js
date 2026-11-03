@@ -1,16 +1,16 @@
 // ============================================================
-// CLOAKUP - Endpoint Principal de Cloaking
+// PROTEÇÃO DE TRÁFEGO — Endpoint Principal
 // Rota: /api/cloak/*
 // ============================================================
-// LÓGICA SIMPLES - Apenas 2 DESTINOS POSSÍVEIS:
+// LÓGICA SIMPLES - APENAS 2 DESTINOS POSSÍVEIS:
 //
 //   1. Bots, crawlers, robots, headless -> WHITE URL
-//   2. Desktop/PC (Windows / Mac / Linux) -> WHITE URL
+//   2. Desktop / PC (Windows / Mac / Linux) -> WHITE URL
 //   3. Mobile (Android / iOS / qualquer celular) -> BLACK URL
 //
 // SOMENTE 2 DESTINOS: whiteUrl e blackUrl.
-// NADA de tela de bloqueio, NADA de redirecionar para TikTok,
-// NADA de intermediação.
+// NADA de tela de bloqueio, NADA de rede de captura,
+// NADA de redirecionar para TikTok, NADA de intermediação.
 // ============================================================
 
 import { isBot, isEmulator, getPlatform } from '../../../utils/ua.js';
@@ -22,13 +22,13 @@ const { STORAGE_DIR, storagePath } = await import('../storage.js');
 const CONFIG_PATH = storagePath('config.json');
 const LOGS_PATH = storagePath('access.log');
 
+// Configuração padrão segura — NUNCA usa tiktok.com
 const DEFAULT_CONFIG = {
-  brandName: 'CLOAKUP',
-  brandSlogan: 'Proteção de tráfego de alto nível para TikTok Ads',
+  brandName: 'TikTok Protection',
+  brandSlogan: 'Proteção inteligente de tráfego — apenas 2 destinos',
 
   blackUrl: '',
-  whiteUrl: 'https://www.tiktok.com',
-  decoyUrl: 'https://www.tiktok.com',
+  whiteUrl: '',
 
   whitelistEnabled: true,
   whitelistIPs: [],
@@ -43,7 +43,8 @@ const DEFAULT_CONFIG = {
   customBlockedUAs: [],
   blockEmulators: true,
 
-  // Filtros opcionais - desligados por padrão para a regra ser SIMPLES (só dispositivo + bot)
+  // Filtros adicionais — DESLIGADOS por padrão.
+  // Regra principal é apenas: dispositivo (mobile -> black, tudo resto -> white).
   proxyEnabled: false,
   adsSpyEnabled: false,
   geoEnabled: false,
@@ -61,12 +62,12 @@ const DEFAULT_CONFIG = {
 
 // Funções expostas para debug / testes
 export function readConfig() {
-  // 1) Variaveis de ambiente (Vercel dashboard) - SEMPRE sobrepoe (se definidas)
+  // 1) Variáveis de ambiente (Vercel dashboard) — SEMPRE sobrepõem (se definidas)
   const envConfig = {};
   if (process.env.CLOAKER_BLACK_URL) envConfig.blackUrl = process.env.CLOAKER_BLACK_URL;
   if (process.env.CLOAKER_WHITE_URL) envConfig.whiteUrl = process.env.CLOAKER_WHITE_URL;
 
-  // 2) Arquivo config do .cloaker (config base commitada) - lida com erro, nao falha
+  // 2) Arquivo config do .cloaker (config base commitada) — lida com erro, não falha
   const fileConfig = {};
   try {
     if (fs.existsSync(CONFIG_PATH)) {
@@ -75,11 +76,12 @@ export function readConfig() {
     }
   } catch { /* json invalido ou ausencia -> ignora */ }
 
-  // Merge: default < file < env (env só conta se definida, pra nao sobrescrever com undefined)
+  // Merge: default < file < env (env só conta se definida, pra não sobrescrever com undefined)
   return { ...DEFAULT_CONFIG, ...fileConfig, ...envConfig };
 }
+
 // ============================================================
-// LOGGING (apenas auditoria, nunca bloqueia)
+// LOGGING (apenas auditoria, nunca bloqueia, nunca redireciona)
 // ============================================================
 export async function logDecision(request, result) {
   const ua = request.headers.get('user-agent') || '';
@@ -110,19 +112,19 @@ export async function logDecision(request, result) {
 }
 
 // ============================================================
-// MOTOR DE DECISÃO SIMPLES - Apenas 2 destinos: WHITE ou BLACK
+// MOTOR DE DECISÃO - apenas 2 destinos: WHITE ou BLACK
 // ============================================================
 export function decide(request, config) {
   const ua = request.headers.get('user-agent') || '';
   const uaLower = ua.toLowerCase();
   const result = {
-    decision: null,     // 'WHITE' | 'BLACK'
+    decision: null,   // 'WHITE' | 'BLACK'
     reason: null,
     platform: 'unknown',
     filters: [],
   };
 
-  // --- 1. Token de bypass (permite ir direto para o BLACK - util para voce) ---
+  // --- 1. Token de bypass (permite ir direto para o BLACK - só para teste) ---
   const bypass = new URL(request.url).searchParams.get(config.bypassParam) ||
                  new URL(request.url).searchParams.get('token');
   if (bypass) {
@@ -132,7 +134,7 @@ export function decide(request, config) {
     return result;
   }
 
-  // --- 2. Whitelist de IPs (ACESSO ao BLACK - ex: voce/admin) ---
+  // --- 2. Whitelist de IPs (ACESSO ao BLACK - ex: admin / teste) ---
   const ip = (request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
               request.headers.get('x-real-ip') || 'unknown');
   if (config.whitelistEnabled && config.whitelistIPs.includes(ip)) {
@@ -145,7 +147,7 @@ export function decide(request, config) {
   // --- 3. Detecção de bot / crawler / robot / script / headless -> WHITE ---
   let detectedBot = null;
 
-  // Bots das redes sociais / anuncios
+  // Bots das redes sociais / anúncios
   for (const sig of config.strictTiktokBots || []) {
     if (uaLower.includes(sig.toLowerCase())) {
       detectedBot = 'TIKTOK_' + sig.replace(/\s/g, '_');
@@ -185,7 +187,7 @@ export function decide(request, config) {
   }
 
   // --- 5. Proxy / VPN / Datacenter (OPCIONAL) -> WHITE se ativo ---
-  //    Desligado por padrao para manter a regra SIMPLES
+  //    Desligado por padrão para manter a regra SIMPLES
   if (config.proxyEnabled) {
     try {
       const type = detectASN(ip);
@@ -198,8 +200,8 @@ export function decide(request, config) {
     } catch { /* sem IPDB, ignora */ }
   }
 
-  // --- 6. Geolocalizacao (OPCIONAL) -> WHITE se pais bloqueado/permitido ---
-  //    Desligado por padrao para manter a regra SIMPLES
+  // --- 6. Geolocalização (OPCIONAL) -> WHITE se país bloqueado/permitido ---
+  //    Desligado por padrão para manter a regra SIMPLES
   if (config.geoEnabled) {
     let country = request.headers.get('cf-ipcountry') ||
                   request.headers.get('x-geocluster') ||
@@ -229,7 +231,7 @@ export function decide(request, config) {
   }
 
   // ============================================================
-  // DECISAO FINAL POR DISPOSITIVO (REGRAS PRINCIPAIS)
+  // DECISÃO FINAL POR DISPOSITIVO (REGRAS PRINCIPAIS)
   // ============================================================
   const platform = getPlatform(ua);
 
@@ -252,7 +254,7 @@ export function decide(request, config) {
     return result;
   }
 
-  // Qualquer UA desconhecido -> WHITE (padrao seguro)
+  // Qualquer UA desconhecido -> WHITE (padrão seguro)
   result.decision = 'WHITE';
   result.reason = 'UNKNOWN';
   result.platform = platform || 'unknown';
@@ -261,7 +263,7 @@ export function decide(request, config) {
 }
 
 // ============================================================
-// REDIRECIONAMENTO - resolve WHITE ou BLACK
+// REDIRECIONAMENTO - resolve WHITE ou BLACK (APENAS 2 DESTINOS)
 // ============================================================
 export function resolveTarget(request, decision, config) {
   const campaignId = new URL(request.url).searchParams.get('campaign_id');
@@ -271,15 +273,15 @@ export function resolveTarget(request, decision, config) {
       const camp = config.campaigns.find(c => String(c.campaignId) === String(campaignId));
       if (camp && camp.blackUrl) return camp.blackUrl;
     }
-    return config.blackUrl || 'https://www.tiktok.com';
+    return config.blackUrl || '';
   }
 
-  // WHITE (padrao)
+  // WHITE (padrão para bots, desktop e desconhecidos)
   if (campaignId) {
     const camp = config.campaigns.find(c => String(c.campaignId) === String(campaignId));
     if (camp && camp.whiteUrl) return camp.whiteUrl;
   }
-  return config.whiteUrl || config.decoyUrl || 'https://www.tiktok.com';
+  return config.whiteUrl || '';
 }
 
 // ============================================================
@@ -293,7 +295,7 @@ export default async function handler(request) {
   const config = readConfig();
   const result = decide(request, config);
 
-  // Log da decisão (assincrono, nao bloqueia)
+  // Log da decisão (assíncrono, não bloqueia)
   logDecision(request, result).catch(() => {});
 
   // Redireciona para o destino correto

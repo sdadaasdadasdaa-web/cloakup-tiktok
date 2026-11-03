@@ -1,5 +1,5 @@
 // ============================================================
-// SEED SCRIPT - Corrige o .cloaker/config.json automaticamente
+// SEED SCRIPT - Corrige o config.json automaticamente
 // Roda antes/depois do deploy para garantir que o config esteja valido
 // ============================================================
 
@@ -11,13 +11,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DEFAULT_CONFIG = {
-  brandName: 'CLOAKUP',
-  brandSlogan: 'Proteção de tráfego de alto nível para TikTok Ads',
-  mode: 'moderate',
+  brandName: 'TikTok Protection',
+  brandSlogan: 'Proteção inteligente de tráfego — apenas 2 destinos',
   blackUrl: '',
-  whiteUrl: 'https://www.tiktok.com',
-  decoyUrl: 'https://www.tiktok.com',
-  leadCaptureUrl: '/capture',
+  whiteUrl: '',
   whitelistEnabled: true,
   whitelistIPs: [],
   blacklistEnabled: false,
@@ -26,13 +23,12 @@ const DEFAULT_CONFIG = {
   blockSearchBots: true,
   customBlockedUAs: [],
   blockEmulators: true,
-  proxyEnabled: true,
-  adsSpyEnabled: true,
-  geoEnabled: true,
+  proxyEnabled: false,
+  adsSpyEnabled: false,
+  geoEnabled: false,
   geoSettings: { allowedCountries: [], blockedCountries: [] },
-  forceMobileOnly: true,
-  refererEnabled: true,
-  paramsEnabled: true,
+  refererEnabled: false,
+  paramsEnabled: false,
   langEnabled: false,
   allowedLanguages: [],
   uaEnabled: false,
@@ -52,17 +48,17 @@ function seedConfig() {
   // Cria pasta .cloaker se nao existir
   if (!fs.existsSync(STORAGE_DIR)) {
     fs.mkdirSync(STORAGE_DIR, { recursive: true });
-    console.log('Criou pasta .cloaker');
+    console.log('Criou pasta de storage');
   }
   
-  // Se o config nao existe, cria o padrao
+  // Se o config não existe, cria o padrao
   if (!fs.existsSync(STORAGE_PATH)) {
     fs.writeFileSync(STORAGE_PATH, JSON.stringify(DEFAULT_CONFIG, null, 2), 'utf8');
-    console.log('Criou config.json padrao');
+    console.log('Criou config.json padrão');
     return;
   }
   
-  // Se existe, verifica se e valido
+  // Se existe, verifica se é válido
   try {
     let current = JSON.parse(fs.readFileSync(STORAGE_PATH, 'utf8'));
     
@@ -84,10 +80,10 @@ function seedConfig() {
   } catch (e) {
     console.error('Erro ao ler config, recriando padrao:', e.message);
     fs.writeFileSync(STORAGE_PATH, JSON.stringify(DEFAULT_CONFIG, null, 2), 'utf8');
-    console.log('Config.json recriado com padrao');
+    console.log('Config.json recriado com padrão');
   }
   
-  console.log('=== SEED CONCLUIDO ===');
+  console.log('=== SEED CONCLUÍDO ===');
 }
 
 seedConfig();

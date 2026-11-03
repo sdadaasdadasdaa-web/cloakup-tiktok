@@ -1,7 +1,10 @@
 // language: JavaScript, file: app/capture/page.js, target: Next.js 14, Vercel
-// *Landing page de captura de leads — exibida quando o mobile chega sem os params completos do anúncio.
+// *Página de captura de leads — exibida quando o mobile chega sem os params completos do anúncio.
 //  No modo moderate, o lead deixa o contato e depois recebe o acesso ao produto.
 //  No strict, esta página NÃO aparece — o usuário é bloqueado.
+//
+//  OBSERVAÇÃO: No modo atual (apenas 2 destinos: mobile -> BLACK, tudo resto -> WHITE),
+//  esta página NÃO é usada pelo endpoint principal. Serve como fallback opcional.
 
 'use client';
 
@@ -91,7 +94,7 @@ export default function CapturePage() {
       )}
 
       <footer style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid #333', color: '#666', fontSize: '0.85rem', textAlign: 'center' }}>
-        <p>© 2026 Cloaker Genérico. Acesso exclusivo para mobile.</p>
+        <p>© 2026 Proteção de Tráfego. Acesso exclusivo para mobile.</p>
       </footer>
     </div>
   );

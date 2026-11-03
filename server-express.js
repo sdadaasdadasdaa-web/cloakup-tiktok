@@ -89,9 +89,9 @@ app.get('/', (req, res) => {
   res.send(`
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>CLOAKER v2.0</title></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Proteção de Tráfego v2.0</title></head>
 <body style="background:#0a0a0a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:40px;text-align:center;">
-  <h1 style="color:#4fd1c2">CLOAKER v2.0 - Fallback</h1>
+  <h1 style="color:#4fd1c2">Proteção de Tráfego v2.0 - Fallback</h1>
   <p>O servidor Next.js náo pôde iniciar completamente (spawn EPERM nesta ferramenta).</p>
   <p>Rotas API disponiveis. Para o painel completo: abra um terminal e rode <code>npm run dev</code>.</p>
   <ul style="text-align:left;display:inline-block;margin-top:20px;">
@@ -111,7 +111,7 @@ app.get('/admin', (req, res) => {
 <html lang="pt-BR">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Admin - Fallback</title></head>
 <body style="background:#0a0a0a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:40px;">
-  <h1 style="color:#4fd1c2">Admin CLOAKER v2.0 - Modo Fallback</h1>
+  <h1 style="color:#4fd1c2">Admin Proteção de Tráfego v2.0 - Modo Fallback</h1>
   <p style="color:#f56565">O painel interativo náo está disponível neste modo.</p>
   <p>Para usar o painel completo, abra um terminal e rode <code>npm run dev</code>, depois acesse http://localhost:3000/admin</p>
   <h3 style="color:#fff">API Disponivel</h3>
@@ -135,7 +135,7 @@ app.get('/admin', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`
-🚀 CLOAKER Fallback expressivo em http://localhost:${PORT}
+🚀 Proteção de Tráfego Fallback expressivo em http://localhost:${PORT}
 
 Rotas API:
   GET/POST http://localhost:${PORT}/api/cloak      - cascata de filtros

@@ -1,4 +1,4 @@
-# 🚀 DEPLOY NO VERCEL - Cloaker Genérico
+# 🚀 DEPLOY NA VERCEL - Proteção de Tráfego
 
 Este projeto precisa ser deployado na Vercel para acessar o `/api/cloak` pela internet.
 
@@ -14,7 +14,8 @@ Os arquivos **`.cloaker/config.json`** e **`.cloaker/access.log`** são **privad
 
 1. Na Vercel, vá em **Settings > Environment Variables**
 2. Adicione:
-   - `CLOAKER_CONFIG` → conteúdo do seu arquivo `.cloaker/config.json` (JSON completo, com as campanhas)
+   - `CLOAKER_BLACK_URL` → `https://importa-chiina.vercel.app/` (oferta real, para mobile)
+   - `CLOAKER_WHITE_URL` → `https://www.mundo-surf.com/...` (disfarce, para bots e PC)
 3. O `route.js` lerá desse ambiente se não achar o arquivo
 
 ### Opção B: Subir o `.cloaker` commitando temporariamente

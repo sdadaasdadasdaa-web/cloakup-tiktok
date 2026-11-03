@@ -1,23 +1,19 @@
 // ============================================================
-// API de SEED - Corrige o .cloaker/config.json se estiver corrompido
+// API de SEED - Corrige o config.json se estiver corrompido
 // Rodar: POST /api/seed/config
 // ============================================================
 
 import { NextResponse } from 'next/server.js';
 import fs from 'fs';
-import path from 'path';
 import { STORAGE_DIR, storagePath } from '../storage.js';
 
 const STORAGE_PATH = storagePath('config.json');
 
 const DEFAULT_CONFIG = {
-  brandName: 'CLOAKUP',
-  brandSlogan: 'Proteção de tráfego de alto nível para TikTok Ads',
-  mode: 'moderate',
+  brandName: 'TikTok Protection',
+  brandSlogan: 'Proteção inteligente de tráfego — apenas 2 destinos',
   blackUrl: '',
-  whiteUrl: 'https://www.tiktok.com',
-  decoyUrl: 'https://www.tiktok.com',
-  leadCaptureUrl: '/capture',
+  whiteUrl: '',
   whitelistEnabled: true,
   whitelistIPs: [],
   blacklistEnabled: false,
@@ -26,13 +22,12 @@ const DEFAULT_CONFIG = {
   blockSearchBots: true,
   customBlockedUAs: [],
   blockEmulators: true,
-  proxyEnabled: true,
-  adsSpyEnabled: true,
-  geoEnabled: true,
+  proxyEnabled: false,
+  adsSpyEnabled: false,
+  geoEnabled: false,
   geoSettings: { allowedCountries: [], blockedCountries: [] },
-  forceMobileOnly: true,
-  refererEnabled: true,
-  paramsEnabled: true,
+  refererEnabled: false,
+  paramsEnabled: false,
   langEnabled: false,
   allowedLanguages: [],
   uaEnabled: false,
@@ -45,15 +40,15 @@ const DEFAULT_CONFIG = {
 
 export async function POST() {
   try {
-    // Cria pasta .cloaker se necessario
+    // Cria pasta de storage se necessário
     if (!fs.existsSync(STORAGE_DIR)) {
       fs.mkdirSync(STORAGE_DIR, { recursive: true });
     }
 
-    // Se nao tem config, cria o padrao
+    // Se não tem config, cria o padrão
     if (!fs.existsSync(STORAGE_PATH)) {
       fs.writeFileSync(STORAGE_PATH, JSON.stringify(DEFAULT_CONFIG, null, 2), 'utf8');
-      return NextResponse.json({ success: true, message: 'Config criado do padrao', config: DEFAULT_CONFIG });
+      return NextResponse.json({ success: true, message: 'Config criado do padrão', config: DEFAULT_CONFIG });
     }
 
     // Tenta ler o config atual

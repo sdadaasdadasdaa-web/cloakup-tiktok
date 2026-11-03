@@ -1,9 +1,9 @@
 // language: JavaScript, file: app/layout.js, target: Next.js 14, Vercel
-// *Layout raiz do projeto — serve como base para toda a interface do cloaker.
+// *Layout raiz do projeto — base de toda a interface.
 
 export const metadata = {
-  title: 'Cloaker Genérico — Proteção de Oferta',
-  description: 'Cloaker genérico estilo CloakUp — protege ofertas de bots e direciona leads qualificados',
+  title: 'Proteção de Tráfego — Disfarce para Bots',
+  description: 'Proteção de tráfego inteligente — redireciona bots e desktop para um disfarce, mobile para a oferta',
 };
 
 export default function RootLayout({ children }) {

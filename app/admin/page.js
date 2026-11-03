@@ -151,7 +151,7 @@ export default function AdminPage() {
       const newCampaigns = [...(config?.campaigns || []), { ...form, createdAt: Date.now() }];
       const newConfig = { ...config, campaigns: newCampaigns };
       if (!config?.blackUrl) newConfig.blackUrl = form.blackUrl;
-      if (!config?.decoyUrl) newConfig.decoyUrl = form.whiteUrl || 'https://www.tiktok.com';
+      if (!config?.decoyUrl) newConfig.decoyUrl = form.whiteUrl;
       const res = await fetch(`${SAVE_PATH}?_t=${Date.now()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -161,7 +161,7 @@ export default function AdminPage() {
       if (data.success) {
         setConfig(data.config);
         setCampaigns(newCampaigns);
-        const link = getTiktokLink({ ...form, blackUrl: form.blackUrl });
+        const link = generateLink({ ...form, blackUrl: form.blackUrl });
         try {
           await navigator.clipboard.writeText(link);
           setMessage({ type: 'success', text: 'Criada! Link copiado: ' + form.campaignId });
@@ -197,7 +197,7 @@ export default function AdminPage() {
 
   const getCampaign = (id) => campaigns.find(c => c.campaignId === id);
 
-  const getTiktokLink = (campaign) => {
+  const generateLink = (campaign) => {
     const baseUrl = 'https://' + window.location.host;
     const params = new URLSearchParams({
       utm_source: 'tiktok',
@@ -210,7 +210,7 @@ export default function AdminPage() {
   };
 
   const copyLink = async (campaign) => {
-    const link = getTiktokLink(campaign);
+    const link = generateLink(campaign);
     try {
       await navigator.clipboard.writeText(link);
       setMessage({ type: 'success', text: 'Link copiado: ' + campaign.campaignId });
@@ -236,25 +236,22 @@ export default function AdminPage() {
   };
 
   const defaultConfig = () => ({
-    brandName: 'CLOAKUP',
-    brandSlogan: 'Proteção de tráfego de alto nível para TikTok Ads',
-    mode: 'moderate',
-    blackUrl: 'https://importa-chiina.vercel.app/',
-    whiteUrl: 'https://www.tiktok.com',
-    decoyUrl: 'https://www.tiktok.com',
+    brandName: 'TikTok Protection',
+    brandSlogan: 'Proteção inteligente de tráfego — apenas 2 destinos',
+    blackUrl: '',
+    whiteUrl: '',
     whitelistEnabled: true, whitelistIPs: [],
     blacklistEnabled: false, blacklistIPs: [],
     strictTiktokBots: ['TikTok Advertising', 'TikTok Ads Manager', 'TikTok Pixel', 'tiktok-tracker', 'omnilabs', 'bytedance', 'ByteDance'],
     blockSearchBots: true,
     customBlockedUAs: [],
     blockEmulators: true,
-    proxyEnabled: true,
-    adsSpyEnabled: true,
-    geoEnabled: true,
+    proxyEnabled: false,
+    adsSpyEnabled: false,
+    geoEnabled: false,
     geoSettings: { allowedCountries: [], blockedCountries: [] },
-    forceMobileOnly: true,
-    refererEnabled: true,
-    paramsEnabled: true,
+    refererEnabled: false,
+    paramsEnabled: false,
     langEnabled: false,
     allowedLanguages: [],
     uaEnabled: false,
@@ -366,7 +363,7 @@ export default function AdminPage() {
               </div>
               <div>
                 <label style={styles.label}>SITE WHITE</label>
-                <input type="text" value={form.whiteUrl} onChange={(e) => setForm({ ...form, whiteUrl: e.target.value })} placeholder="https://www.tiktok.com" style={styles.input} />
+                <input type="text" value={form.whiteUrl} onChange={(e) => setForm({ ...form, whiteUrl: e.target.value })} placeholder="https://site-de-disfarce.com.br/" style={styles.input} />
               </div>
             </div>
             <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
@@ -392,7 +389,7 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div style={{ marginTop: '8px', fontFamily: 'monospace', fontSize: '0.75rem', color: '#4fd1c2', wordBreak: 'break-all' }}>
-                  {getTiktokLink(c)}
+                  {generateLink(c)}
                 </div>
               </div>
             ))}

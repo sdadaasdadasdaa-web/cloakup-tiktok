@@ -1,38 +1,43 @@
 // language: JavaScript, file: app/api/cloak/config/route.js, target: Next.js 14, Vercel
-// *API endpoint: GET/POST /api/cloak/config/* — CRUD da configuracao do cloaker.
+// *API endpoint: GET/POST /api/cloak/config/* — CRUD da configuracao do sistema.
 //  Exemplos:
 //    GET  /api/cloak/config/*       -> retorna a configuracao atual (com campanhas)
 //    POST /api/cloak/config/*       -> salva a configuracao (recebe JSON completo)
 
 import fs from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server.js';
 import { STORAGE_DIR, storagePath } from '../../storage.js';
 
 const STORAGE_PATH = storagePath('config.json');
 
 const DEFAULT_CONFIG = {
-  mode: 'moderate',
-  blockSearchBots: true,
-  customBlockedUAs: [],
-  whitelistedIPs: [],
-  sessionLifetime: 1800,
-  exemptPaths: ['/api/cloak/', '/api/cloak/config/', '/api/lead/', '/api/logs/', '/api/proxy/', '/_next/', '/_vercel/', '/admin/', '/health', '/favicon.ico'],
-  leadCaptureUrl: '/capture',
-  bypassToken: null,
-  decoyUrl: 'https://www.tiktok.com',
+  brandName: 'TikTok Protection',
+  brandSlogan: 'Proteção inteligente de tráfego — apenas 2 destinos',
   blackUrl: '',
-  gatewayProtection: true,
+  whiteUrl: '',
+  whitelistEnabled: true,
+  whitelistIPs: [],
+  blacklistEnabled: false,
+  blacklistIPs: [],
   strictTiktokBots: [
     'TikTok Advertising', 'TikTok Ads Manager', 'TikTok Pixel', 'tiktok-tracker',
     'omnilabs', 'bytedance', 'ByteDance', 'ByteDance-InstaFeed-Jackson', 'TikTok Download Video',
   ],
-  forceMobileOnly: true,
+  blockSearchBots: true,
+  customBlockedUAs: [],
   blockEmulators: true,
+  proxyEnabled: false,
+  adsSpyEnabled: false,
+  geoEnabled: false,
+  geoSettings: { allowedCountries: [], blockedCountries: [] },
+  refererEnabled: false,
+  paramsEnabled: false,
+  langEnabled: false,
+  uaEnabled: false,
+  uaPatterns: [],
+  ispEnabled: false,
   bypassParam: 'bypass',
   bypassSessionLifetime: 2592000,
-  geoSettings: { enabled: false, allowedCountries: [], blockedCountries: [] },
-  notifications: { email: '', telegramBotToken: '', telegramChatId: '' },
   campaigns: [],
 };
 

@@ -1,7 +1,7 @@
 // language: JavaScript, file: app/api/cloak/token.js, target: Next.js 14, Vercel
-// *API endpoint: GET/POST /api/cloak/token — gera e valida token bypass estilo Clocap/CloakUp.
+// *API endpoint: GET/POST /api/cloak/token — gera e valida token bypass.
 //  O token libera acesso independente de UA/dispositivo (modo emergencial, teste ou cliente VIP).
-//  O token é assinado com segredo armazenado no config do cloaker.
+//  O token é assinado com segredo armazenado no storage do sistema.
 //
 //  POST /api/cloak/token  -> { success, token, secret, expires_in, usage }
 //  GET  /api/cloak/token?token=XYZ -> { valid, payload }

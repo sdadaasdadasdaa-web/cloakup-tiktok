@@ -3,14 +3,14 @@
 import Link from 'next/link';
 
 // language: JavaScript, file: app/page.js, target: Next.js 14, Vercel
-// *Página inicial estilo CloakUp: "Como funciona" em 3 etapas + filtros principais
-//  Esta página mostra ao usuário o processo de configuração do cloaker.
+// *Página inicial estilo "Proteção de Tráfego": "Como funciona" em 3 etapas + filtros principais
+//  Esta página mostra ao usuário o processo de configuração do sistema de proteção.
 
 export default function Home() {
   return (
     <div style={{ background: 'linear-gradient(135deg, #0a0a0a 0%, #141414 100%)', minHeight: '100vh', color: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       <nav style={{ padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #2a2a2a' }}>
-        <Link href="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#4fd1c2', textDecoration: 'none' }}>CLOAKUP</Link>
+        <Link href="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#4fd1c2', textDecoration: 'none' }}>Proteção de Tráfego</Link>
         <Link href="/admin" style={{ background: '#4fd1c2', color: '#0a0a0a', padding: '12px 24px', borderRadius: '8px', fontSize: '1rem', fontWeight: 'bold', textDecoration: 'none' }}>
           Acessar Painel
         </Link>
@@ -19,10 +19,10 @@ export default function Home() {
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 24px' }}>
         <section style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h1 style={{ fontSize: '3rem', marginBottom: '16px', lineHeight: 1.1 }}>
-            Proteja Sua Oferta dos Bots do TikTok Ads
+            Proteja Sua Oferta dos Bots e de Bots de Análise
           </h1>
           <p style={{ fontSize: '1.2rem', color: '#888', marginBottom: '32px', maxWidth: '600px', margin: '0 auto' }}>
-            Filtro de tráfego de alto nível estilo CloakUp. Proteja https://importa-chiina.vercel.app/ de bots, serviços de espionagem, concorrentes e tráfego indesejado.
+            Filtro de tráfego inteligente. Apenas 2 destinos possíveis: SITE BLACK (oferta real para mobile) e SITE WHITE (disfarce para bots e desktop).
           </p>
           <Link href="/admin" style={{ background: '#4fd1c2', color: '#0a0a0a', padding: '16px 32px', borderRadius: '12px', fontSize: '1.1rem', fontWeight: 'bold', textDecoration: 'none', display: 'inline-block' }}>
             Começar Agora — É Grátis
@@ -123,8 +123,8 @@ export default function Home() {
       </div>
 
       <footer style={{ textAlign: 'center', color: '#666', padding: '32px', borderTop: '1px solid #2a2a2a', marginTop: '60px' }}>
-        <p>© 2026 CLOAKUP — Proteção de Tráfego para TikTok Ads</p>
-        <p style={{ fontSize: '0.9rem' }}>Inspirado nas melhores práticas do CloakUp, Therabot e Clocap</p>
+        <p>© 2026 Proteção de Tráfego — Redirecionamento Inteligente</p>
+        <p style={{ fontSize: '0.9rem' }}>Inspirado nas melhores práticas do mercado</p>
       </footer>
     </div>
   );
@@ -136,7 +136,7 @@ const filters = [
   { icon: '👁️', name: 'AdSpy', desc: 'Impede que apps de espionagem de anúncios monitorem suas campanhas' },
   { icon: '🌍', name: 'Geolocalização', desc: 'Permite ou bloqueia acessos baseados no país do visitante' },
   { icon: '📱', name: 'Dispositivos', desc: 'Aceita só celulares reais, bloqueia desktops e emuladores' },
-  { icon: '🔗', name: 'Referência', desc: 'Valida se o tráfego veio do TikTok (referer tiktok.com)' },
+  { icon: '🔗', name: 'Referência', desc: 'Valida se o tráfego veio de tiktok.com (referer)' },
   { icon: '🔖', name: 'Parâmetros URL', desc: 'Exige utm_source, utm_campaign, utm_medium, utm_content completos' },
   { icon: '🌐', name: 'Idioma', desc: 'Filtra por Accept-Language (ex: só pt-BR)' },
   { icon: '👤', name: 'User Agent', desc: 'Bloqueia UAs específicos ou padrões customizados' },

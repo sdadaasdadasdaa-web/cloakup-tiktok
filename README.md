@@ -1,57 +1,49 @@
-# CLOAKUP - TikTok Ads Protection (v2.0)
+# Proteção de Tráfego — Mobile Only para Oferta (v2.0)
 
-**Proteção de tráfego de alto nível para sua oferta no TikTok Ads**
+**Redirecionamento inteligente: mobile -> oferta real, todo resto -> disfarce**
 
 Proteja `https://importa-chiina.vercel.app/` dos bots do TikTok Ads Manager, serviços de espionagem, concorrentes e qualquer tráfego indesejado.
 
 ---
 
-## 🎯 COMO FUNCIONA (Estilo CloakUp / Therabot)
+## 🎯 COMO FUNCIONA
 
-O CLOAKUP é um filtro de tráfego inteligente que fica na frente da sua oferta:
+O sistema é um redirecionador de tráfego inteligente que fica na frente da sua oferta:
 
 ```
-TikTok Ads → LINK CUSTOMIZADO DO CLOAKUP → [Cascata de 12+ Filtros] → 
-    ✅ Mobile Real + Params TikTok → OFERTA (BLACK)
-    ❌ Bots / PC / Proxy / Espião / Geobloqueado → DISFARCE (WHITE)
+Link do Anúncio -> [/api/cloak] -> [Filtro Simples: Dispositivo + Bots] ->
+    ✅ Mobile Real (Android / iOS) -> OFERTA (BLACK)
+    ❌ Bots / PC / Mac / Desktop / Emulador -> DISFARCE (WHITE)
 ```
 
 ### 3 Etapas Simples
 
-#### 1️⃣ Adicione seu domínio
+#### 1️⃣ Defina os 2 destinos
 Conecte sua oferta de forma rápida e fácil. No painel, defina:
-- **Site BLACK** = Sua oferta real (`https://importa-chiina.vercel.app/`)
-- **Site WHITE** = Seu disfarce (ex: `https://www.tiktok.com` ou site de notícias)
+- **Site BLACK** = Sua oferta real (`https://importa-chiina.vercel.app/`) — para mobile
+- **Site WHITE** = Seu disfarce (ex: `https://www.mundo-surf.com/...`) — para bots e desktop
 
 #### 2️⃣ Crie sua campanha
-Configure suas campanhas de marketing com filtros personalizados:
-- Filtre bots de análise e moderadores
-- Bloqueie proxies, VPNs e serviços de espionagem (AdSpy)
-- Defina geolocalização permitida/bloqueada
-- Escolha dispositivos aceitos (mobile-only recomendado)
-- Valide parâmetros de URL do TikTok Ads
-- Mantenha whitelist/blacklist de IPs
+Configure suas campanhas de marketing:
+- Gere o link customizado com campaign_id
+- O link é o mesmo para todos os dispositivos
+- Cada clique é analisado pelo filtro de dispositivo
 
 #### 3️⃣ Anuncie com link customizado
-Use os links customizados gerados automaticamente no painel. Cada clique é analisado e só o tráfego legítimo chega na sua oferta.
+Use os links customizados gerados automaticamente no painel. Cada clique é analisado e só o tráfego mobile legítimo chega na sua oferta.
 
 ---
 
-## 🛡️ PRINCIPAIS FILTROS
+## 🛡️ FILTRO (regra única)
 
-| Categoria | Descrição |
+| O que chega | Para onde vai |
 |-----------|-----------|
-| **Bots** | Bloqueia bots do TikTok/ByteDance, Google, Facebook, crawlers, scanners (sqlmap, nikto), headless browsers (puppeteer, selenium, playwright) |
-| **Proxy/VPN** | Detecta e bloqueia tráfego de datacenters, VPs, proxies anônimos |
-| **AdSpy** | Bloqueia aplicativos de espionagem de anúncios (adspy, admonitor, etc.) |
-| **Geolocalização** | Permite/bloqueia por país (via Cloudflare, ALB, headers) |
-| **Dispositivos** | Mobile-only, desktop bloqueado, tablets, emuladores (BlueStacks, Genymotion) |
-| **Referência** | Valida se o tráfego veio de tiktok.com / vm.tiktok.com |
-| **Parâmetros de URL** | Exige utm_source, utm_campaign, utm_medium, utm_content |
-| **Linguagem do Navegador** | Filtra por Accept-Language (ex: só pt-BR, en-US) |
-| **User Agent** | Bloqueia UAs específicos ou padrões personalizados |
-| **ISP** | Bloqueia provedores de datacenter/conteúdo |
-| **Whitelist/Blacklist** | Sua própria lista de IPs permitidos ou bloqueados |
+| **Celular real** (iPhone / Android / qualquer celular) | **SITE BLACK (oferta)** ✅ |
+| **PC / Notebook / Mac / Linux** | **SITE WHITE (disfarce)** ❌ |
+| **Bots / crawlers / robots / headless** | **SITE WHITE (disfarce)** ❌ |
+| **Emuladores** (BlueStacks, Genymotion, etc.) | **SITE WHITE (disfarce)** ❌ |
+
+Regra simples: **apenas 2 destinos possíveis — whiteUrl e blackUrl. Nada de telas de bloqueio, nada de intermediação, nada de redes sociais.**
 
 ---
 
@@ -61,46 +53,35 @@ Use os links customizados gerados automaticamente no painel. Cada clique é anal
 cloaker deep/
 ├── app/
 │   ├── api/
+├── app/
+│   ├── api/
 │   │   ├── cloak/
-│   │   │   ├── route.js          # NÚCLEO: engine de cloaking (cascade de filtros)
-│   │   │   └── token.js          # Gera token bypass estilo CloakUp
+│   │   │   └── route.js          # NÚCLEO: redirecionamento (apenas 2 destinos)
 │   │   ├── config/
-│   │   │   └── route.js          # CRUD completo de filtros
+│   │   │   └── route.js          # CRUD de filtros
 │   │   ├── logs/
-│   │   │   └── route.js          # Auditoria de acessos em tempo real
-│   │   ├── lead/
-│   │   │   └── route.js          # Captura de leads (opcional)
-│   │   └── proxy/
-│   │       └── route.js          # Proxy de checkout (oculta link BLACK do referer)
+│   │   │   └── route.js          # Auditoria de acessos
+│   │   └── seed/
+│   │       └── config.js         # Seed de config
 │   ├── admin/
-│   │   └── page.js               # PAINEL ADMINISTRATIVO (estilo CloakUp)
+│   │   └── page.js               # PAINEL ADMINISTRATIVO
 │   ├── capture/
-│   │   └── page.js               # Landing de captura (modo moderate)
+│   │   └── page.js               # Captura de leads (opcional, não usada no fluxo principal)
 │   ├── health/
 │   │   └── route.js              # Health check
 │   ├── page.js                   # Landing "3 etapas" (página inicial)
 │   └── layout.js                 # Layout global
-├── filters/
-│   ├── engine.js                 # Motor de cascade de filtros
-│   ├── bot-filter.js             # Filtro de bots
-│   ├── proxy-filter.js           # Filtro de proxy/VPN/datacenter
-│   ├── ads spy-filter.js         # Filtro de AdSpy
-│   ├── geo-filter.js             # Filtro de geolocalização
-│   ├── device-filter.js          # Filtro de dispositivos
-│   ├── referer-filter.js         # Filtro de referer
-│   ├── params-filter.js          # Filtro de parâmetros URL
-│   ├── lang-filter.js            # Filtro de linguagem
-│   ├── ua-filter.js              # Filtro de User Agent
-│   ├── isp-filter.js             # Filtro de ISP
-│   ├── whitelist-filter.js       # Whitelist/Blacklist de IPs
-│   └── decision.js               # Resolvedor de decisão final
 ├── utils/
 │   ├── ua.js                     # Detecção de bot/mobile/emulador
-│   ├── utm.js                    # Validação de params TikTok
-│   └── ip.js                     # Utilitários de IP/geolocalização
+│   ├── utm.js                    # Validação de params
+│   └── ip.js                     # Utilitários de IP
 ├── .cloaker/
-│   ├── config.json               # CONFIGURAÇÕES COMPLETAS (privado)
-│   └── access.log                # LOGS DE ACESSO (privado)
+│   ├── config.json               # CONFIGURAÇÕES (privado — COMMITADO)
+│   └── bypass_secret.txt         # Segredo de bypass (privado)
+├── .gitignore                    # Regras de git
+├── package.json
+├── README.md                     # Este arquivo
+└── start.bat                     # Inicia servidor local
 ├── package.json
 ├── vercel.json                   # Config de deploy
 ├── start.bat                     # Iniciar localmente
